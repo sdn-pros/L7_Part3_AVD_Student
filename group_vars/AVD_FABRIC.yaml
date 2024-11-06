@@ -1,0 +1,41 @@
+---
+fabric_name: AVD_FABRIC
+
+underlay_routing_protocol: ebgp
+
+overlay_routing_protocol: ebgp
+
+evpn_vlan_aware_bundles: false
+
+# bgp peer groups passwords
+bgp_peer_groups:
+  ipv4_underlay_peers:
+
+  evpn_overlay_peers:
+
+  mlag_ipv4_underlay_peer:
+
+# BGP defaults
+bgp_default_ipv4_unicast: false
+bgp_update_wait_install: false
+bgp_update_wait_for_convergence: false
+bgp_distance:
+  external_routes: 20
+  internal_routes: 200
+  local_routes: 200
+
+
+service_routing_protocols_model: multi-agent
+
+custom_structured_configuration_spanning_tree:
+  mode: mstp
+
+ip_routing: true
+
+
+
+# Needed for Arista ATD Lab Environment
+dns_domain: atd.lab
+mgmt_interface: MGMT
+mgmt_interface_vrf: default
+mgmt_gateway: 192.168.0.1

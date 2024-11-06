@@ -1,0 +1,76 @@
+---
+servers:
+  - name: host1-DC1
+    rack: rack01
+    adapters:
+      - endpoint_ports:
+          - Ethernet1
+          - Ethernet2
+        switch_ports:
+          - Ethernet6
+          - Ethernet6
+        switches:
+          - leaf1-DC1
+          - leaf2-DC1
+        mode: trunk
+        vlans: 110
+        spanning_tree_portfast: edge
+        port_channel:
+          description: PortChannel5
+          mode: active
+  - name: host2-dc1
+    rack: rack01
+    adapters:
+      - endpoint_ports:
+          - Ethernet1
+          - Ethernet2
+        switch_ports:
+          - Ethernet6
+          - Ethernet6
+        switches:
+          - leaf3-DC1
+          - leaf4-DC1
+        mode: trunk
+        vlans: 112
+        spanning_tree_portfast: edge
+        port_channel:
+          description: PortChannel6
+          mode: active
+  
+  - name: host1-DC2
+    rack: rack01
+    adapters:
+      - endpoint_ports:
+          - Ethernet1
+          - Ethernet2
+        switch_ports:
+          - Ethernet6
+          - Ethernet6
+        switches:
+          - leaf1-DC2
+          - leaf2-DC2
+        mode: trunk
+        vlans: 120
+        spanning_tree_portfast: edge
+        port_channel:
+          description: PortChannel5
+          mode: active
+  - name: host2-DC2
+    rack: rack01
+    adapters:
+      - endpoint_ports:
+          - Ethernet1
+          - Ethernet2
+        switch_ports:
+          - Ethernet6
+          - Ethernet6
+        switches:
+          - leaf3-DC2
+          - leaf3-DC2
+        mode: trunk
+        vlans: 122
+        spanning_tree_portfast: edge
+        port_channel:
+          description: PortChannel6
+          mode: active
+  
