@@ -1,5 +1,5 @@
 ---
-#type: super-spine
+type: super-spine
 
 # BGP defaults
 bgp_default_ipv4_unicast: false
