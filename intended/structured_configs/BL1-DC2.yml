@@ -53,11 +53,11 @@ router_bgp:
   - ip_address: 10.255.252.9
     peer_group: MLAG-IPv4-UNDERLAY-PEER
     description: BL2-DC2
-  - ip_address: 192.168.100.7
+  - ip_address: 192.168.100.5
     peer_group: EVPN-OVERLAY-CORE
     description: BL1-DC1
     remote_as: '65103'
-  - ip_address: 192.168.100.8
+  - ip_address: 192.168.100.6
     peer_group: EVPN-OVERLAY-CORE
     description: BL2-DC1
     remote_as: '65103'
@@ -163,14 +163,14 @@ vlan_interfaces:
 - name: Vlan4093
   description: MLAG_PEER_L3_PEERING
   shutdown: false
-  mtu: 9214
+  mtu: 1500
   ip_address: 10.255.252.8/31
 - name: Vlan4094
   description: MLAG_PEER
   shutdown: false
   ip_address: 10.255.251.8/31
   no_autostate: true
-  mtu: 9214
+  mtu: 1500
 port_channel_interfaces:
 - name: Port-Channel1
   description: MLAG_PEER_BL2-DC2_Po1

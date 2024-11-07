@@ -1,11 +1,14 @@
 hostname: leaf4-DC1
 router_bgp:
   as: '65102'
-  router_id: 192.168.100.6
+  router_id: 192.168.100.4
   distance:
     external_routes: 20
     internal_routes: 200
     local_routes: 200
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
   bgp:
     default:
       ipv4_unicast: false
@@ -44,6 +47,14 @@ router_bgp:
   - ip_address: 10.255.250.4
     peer_group: MLAG-IPv4-UNDERLAY-PEER
     description: leaf3-DC1
+  - ip_address: 192.168.103.12
+    peer_group: IPv4-UNDERLAY-PEERS
+    remote_as: '65100'
+    description: spine1-DC1_Ethernet5
+  - ip_address: 192.168.103.14
+    peer_group: IPv4-UNDERLAY-PEERS
+    remote_as: '65100'
+    description: spine2-DC1_Ethernet5
   - ip_address: 192.168.100.1
     peer_group: EVPN-OVERLAY-PEERS
     description: spine1-DC1
@@ -65,8 +76,8 @@ router_bgp:
       activate: true
   vrfs:
   - name: BLUE
-    router_id: 192.168.100.6
-    rd: 192.168.100.6:20
+    router_id: 192.168.100.4
+    rd: 192.168.100.4:20
     route_targets:
       import:
       - address_family: evpn
@@ -79,8 +90,8 @@ router_bgp:
     redistribute_routes:
     - source_protocol: connected
   - name: RED
-    router_id: 192.168.100.6
-    rd: 192.168.100.6:10
+    router_id: 192.168.100.4
+    rd: 192.168.100.4:10
     route_targets:
       import:
       - address_family: evpn
@@ -95,7 +106,7 @@ router_bgp:
   vlans:
   - id: 113
     tenant: Tenant_A
-    rd: 192.168.100.6:10113
+    rd: 192.168.100.4:10113
     route_targets:
       both:
       - 10113:10113
@@ -103,7 +114,7 @@ router_bgp:
     - learned
   - id: 112
     tenant: Tenant_A
-    rd: 192.168.100.6:10112
+    rd: 192.168.100.4:10112
     route_targets:
       both:
       - 10112:10112
@@ -168,14 +179,14 @@ vlan_interfaces:
 - name: Vlan4093
   description: MLAG_PEER_L3_PEERING
   shutdown: false
-  mtu: 9214
+  mtu: 1500
   ip_address: 10.255.250.5/31
 - name: Vlan4094
   description: MLAG_PEER
   shutdown: false
   ip_address: 10.255.249.5/31
   no_autostate: true
-  mtu: 9214
+  mtu: 1500
 - name: Vlan113
   tenant: Tenant_A
   tags:
@@ -222,6 +233,24 @@ ethernet_interfaces:
   channel_group:
     id: 1
     mode: active
+- name: Ethernet3
+  peer: spine1-DC1
+  peer_interface: Ethernet5
+  peer_type: spine
+  description: P2P_LINK_TO_SPINE1-DC1_Ethernet5
+  shutdown: false
+  mtu: 1500
+  type: routed
+  ip_address: 192.168.103.13/31
+- name: Ethernet4
+  peer: spine2-DC1
+  peer_interface: Ethernet5
+  peer_type: spine
+  description: P2P_LINK_TO_SPINE2-DC1_Ethernet5
+  shutdown: false
+  mtu: 1500
+  type: routed
+  ip_address: 192.168.103.15/31
 mlag_configuration:
   domain_id: DC1_LEAF2
   local_interface: Vlan4094
@@ -247,21 +276,21 @@ loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
   shutdown: false
-  ip_address: 192.168.100.6/32
+  ip_address: 192.168.100.4/32
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
-  ip_address: 192.168.101.5/32
+  ip_address: 192.168.101.3/32
 - name: Loopback20
   description: BLUE_VTEP_DIAGNOSTICS
   shutdown: false
   vrf: BLUE
-  ip_address: 10.255.20.6/32
+  ip_address: 10.255.20.4/32
 - name: Loopback10
   description: RED_VTEP_DIAGNOSTICS
   shutdown: false
   vrf: RED
-  ip_address: 10.255.10.6/32
+  ip_address: 10.255.10.4/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -296,6 +325,6 @@ vxlan_interface:
         vni: 10
 virtual_source_nat_vrfs:
 - name: BLUE
-  ip_address: 10.255.20.6
+  ip_address: 10.255.20.4
 - name: RED
-  ip_address: 10.255.10.6
+  ip_address: 10.255.10.4

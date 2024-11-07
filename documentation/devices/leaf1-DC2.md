@@ -314,8 +314,8 @@ interface Loopback20
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan120 | VRF_RED_VLAN_120 | RED | - | False |
 | Vlan121 | VRF_BLUE_VLAN_121 | BLUE | - | False |
-| Vlan4093 | MLAG_PEER_L3_PEERING | default | 9214 | False |
-| Vlan4094 | MLAG_PEER | default | 9214 | False |
+| Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
+| Vlan4094 | MLAG_PEER | default | 1500 | False |
 
 ##### IPv4
 
@@ -345,13 +345,13 @@ interface Vlan121
 interface Vlan4093
    description MLAG_PEER_L3_PEERING
    no shutdown
-   mtu 9214
+   mtu 1500
    ip address 10.255.252.0/31
 !
 interface Vlan4094
    description MLAG_PEER
    no shutdown
-   mtu 9214
+   mtu 1500
    no autostate
    ip address 10.255.251.0/31
 ```

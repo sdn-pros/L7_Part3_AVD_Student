@@ -45,8 +45,7 @@ all:
               hosts:
                 BL1-DC1:
                   ansible_host: 192.168.0.91
-                BL2-DC1:
-                  ansible_host: 192.168.0.92
+
         DC2:
           children:
             DC2_SPINES:
@@ -73,8 +72,7 @@ all:
               hosts:
                 BL1-DC2:
                   ansible_host: 192.168.0.95
-                BL2-DC2:
-                  ansible_host: 192.168.0.96         
+                
     NETWORK_SERVICES:
       children:
         DC1_LEAVES:

@@ -3,17 +3,9 @@ fabric_name: AVD_FABRIC
 
 underlay_routing_protocol: ebgp
 
-overlay_routing_protocol: ebgp
-
 evpn_vlan_aware_bundles: false
 
-# bgp peer groups passwords
-bgp_peer_groups:
-  ipv4_underlay_peers:
-
-  evpn_overlay_peers:
-
-  mlag_ipv4_underlay_peer:
+p2p_uplinks_mtu: 1500
 
 # BGP defaults
 bgp_default_ipv4_unicast: false

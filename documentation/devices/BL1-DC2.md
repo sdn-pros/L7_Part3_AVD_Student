@@ -304,8 +304,8 @@ interface Loopback20
 
 | Interface | Description | VRF |  MTU | Shutdown |
 | --------- | ----------- | --- | ---- | -------- |
-| Vlan4093 | MLAG_PEER_L3_PEERING | default | 9214 | False |
-| Vlan4094 | MLAG_PEER | default | 9214 | False |
+| Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
+| Vlan4094 | MLAG_PEER | default | 1500 | False |
 
 ##### IPv4
 
@@ -321,13 +321,13 @@ interface Loopback20
 interface Vlan4093
    description MLAG_PEER_L3_PEERING
    no shutdown
-   mtu 9214
+   mtu 1500
    ip address 10.255.252.8/31
 !
 interface Vlan4094
    description MLAG_PEER
    no shutdown
-   mtu 9214
+   mtu 1500
    no autostate
    ip address 10.255.251.8/31
 ```
@@ -492,8 +492,8 @@ ip route 0.0.0.0/0 192.168.0.1
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 10.255.252.9 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | default | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
-| 192.168.100.7 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
-| 192.168.100.8 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
+| 192.168.100.5 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
+| 192.168.100.6 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -552,12 +552,12 @@ router bgp 65203
    neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
    neighbor 10.255.252.9 peer group MLAG-IPv4-UNDERLAY-PEER
    neighbor 10.255.252.9 description BL2-DC2
-   neighbor 192.168.100.7 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.100.7 remote-as 65103
-   neighbor 192.168.100.7 description BL1-DC1
-   neighbor 192.168.100.8 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.100.8 remote-as 65103
-   neighbor 192.168.100.8 description BL2-DC1
+   neighbor 192.168.100.5 peer group EVPN-OVERLAY-CORE
+   neighbor 192.168.100.5 remote-as 65103
+   neighbor 192.168.100.5 description BL1-DC1
+   neighbor 192.168.100.6 peer group EVPN-OVERLAY-CORE
+   neighbor 192.168.100.6 remote-as 65103
+   neighbor 192.168.100.6 description BL2-DC1
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn
