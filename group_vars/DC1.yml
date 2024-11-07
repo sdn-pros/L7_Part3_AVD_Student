@@ -79,8 +79,7 @@ l3leaf:
           mgmt_ip: 192.168.0.24/24
           uplink_switch_interfaces: [Ethernet5, Ethernet5]
 
-    
-  nodes:
+  
     - group: DC1_BORDER_LEAVES
       bgp_as: '65103'
       filter:

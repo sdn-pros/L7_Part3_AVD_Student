@@ -218,6 +218,13 @@ vlan 4094
 
 *Inherited from Port-Channel Interface
 
+##### IPv4
+
+| Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
+| --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
+| Ethernet3 | P2P_LINK_TO_SPINE1-DC2_Ethernet3 | routed | - | 172.31.200.5/31 | default | 1500 | False | - | - |
+| Ethernet4 | P2P_LINK_TO_SPINE2-DC2_Ethernet3 | routed | - | 172.31.200.7/31 | default | 1500 | False | - | - |
+
 #### Ethernet Interfaces Device Configuration
 
 ```eos
@@ -231,6 +238,20 @@ interface Ethernet2
    description MLAG_PEER_leaf1-DC2_Ethernet2
    no shutdown
    channel-group 1 mode active
+!
+interface Ethernet3
+   description P2P_LINK_TO_SPINE1-DC2_Ethernet3
+   no shutdown
+   mtu 1500
+   no switchport
+   ip address 172.31.200.5/31
+!
+interface Ethernet4
+   description P2P_LINK_TO_SPINE2-DC2_Ethernet3
+   no shutdown
+   mtu 1500
+   no switchport
+   ip address 172.31.200.7/31
 ```
 
 ### Port-Channel Interfaces
@@ -476,6 +497,8 @@ ip route 0.0.0.0/0 192.168.0.1
 | ---------- |
 | no bgp default ipv4-unicast |
 | distance bgp 20 200 200 |
+| no bgp default ipv4-unicast |
+| distance bgp 20 200 200 |
 | maximum-paths 4 ecmp 4 |
 
 #### Router BGP Peer Groups
@@ -514,6 +537,8 @@ ip route 0.0.0.0/0 192.168.0.1
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 10.255.252.0 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | default | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
+| 172.31.200.4 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 172.31.200.6 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.200.1 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.2 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 
@@ -548,6 +573,8 @@ router bgp 65201
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
+   no bgp default ipv4-unicast
+   distance bgp 20 200 200
    neighbor EVPN-OVERLAY-PEERS peer group
    neighbor EVPN-OVERLAY-PEERS update-source Loopback0
    neighbor EVPN-OVERLAY-PEERS bfd
@@ -566,6 +593,12 @@ router bgp 65201
    neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
    neighbor 10.255.252.0 peer group MLAG-IPv4-UNDERLAY-PEER
    neighbor 10.255.252.0 description leaf1-DC2
+   neighbor 172.31.200.4 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.200.4 remote-as 65200
+   neighbor 172.31.200.4 description spine1-DC2_Ethernet3
+   neighbor 172.31.200.6 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.200.6 remote-as 65200
+   neighbor 172.31.200.6 description spine2-DC2_Ethernet3
    neighbor 192.168.200.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.1 remote-as 65200
    neighbor 192.168.200.1 description spine1-DC2
