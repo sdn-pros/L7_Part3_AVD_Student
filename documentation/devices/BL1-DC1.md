@@ -154,8 +154,8 @@ vlan internal order ascending range 1006 1199
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet6 | P2P_LINK_TO_SPINE1-DC1_Ethernet6 | routed | - | 192.168.103.17/31 | default | 1500 | False | - | - |
-| Ethernet7 | P2P_LINK_TO_SPINE2-DC1_Ethernet6 | routed | - | 192.168.103.19/31 | default | 1500 | False | - | - |
+| Ethernet6 | P2P_LINK_TO_SPINE1-DC1_Ethernet6 | routed | - | 172.31.100.17/31 | default | 1500 | False | - | - |
+| Ethernet7 | P2P_LINK_TO_SPINE2-DC1_Ethernet6 | routed | - | 172.31.100.19/31 | default | 1500 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -166,14 +166,14 @@ interface Ethernet6
    no shutdown
    mtu 1500
    no switchport
-   ip address 192.168.103.17/31
+   ip address 172.31.100.17/31
 !
 interface Ethernet7
    description P2P_LINK_TO_SPINE2-DC1_Ethernet6
    no shutdown
    mtu 1500
    no switchport
-   ip address 192.168.103.19/31
+   ip address 172.31.100.19/31
 ```
 
 ### Loopback Interfaces
@@ -184,10 +184,10 @@ interface Ethernet7
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.5/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.101.5/32 |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.5/32 |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.5/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.7/32 |
+| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.102.7/32 |
+| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.7/32 |
+| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.7/32 |
 
 ##### IPv6
 
@@ -206,24 +206,24 @@ interface Ethernet7
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.100.5/32
+   ip address 192.168.100.7/32
 !
 interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
-   ip address 192.168.101.5/32
+   ip address 192.168.102.7/32
 !
 interface Loopback10
    description RED_VTEP_DIAGNOSTICS
    no shutdown
    vrf RED
-   ip address 10.255.10.5/32
+   ip address 10.255.10.7/32
 !
 interface Loopback20
    description BLUE_VTEP_DIAGNOSTICS
    no shutdown
    vrf BLUE
-   ip address 10.255.20.5/32
+   ip address 10.255.20.7/32
 ```
 
 ### VXLAN Interface
@@ -329,7 +329,7 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65103|  192.168.100.5 |
+| 65103|  192.168.100.7 |
 
 | BGP Tuning |
 | ---------- |
@@ -375,10 +375,10 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
+| 172.31.100.16 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 172.31.100.18 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.100.1 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.100.2 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 192.168.103.16 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 192.168.103.18 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.200.7 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 
 #### Router BGP EVPN Address Family
@@ -402,15 +402,15 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| BLUE | 192.168.100.5:20 | connected |
-| RED | 192.168.100.5:10 | connected |
+| BLUE | 192.168.100.7:20 | connected |
+| RED | 192.168.100.7:10 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
 router bgp 65103
-   router-id 192.168.100.5
+   router-id 192.168.100.7
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -431,18 +431,18 @@ router bgp 65103
    neighbor IPv4-UNDERLAY-PEERS peer group
    neighbor IPv4-UNDERLAY-PEERS send-community
    neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
+   neighbor 172.31.100.16 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.100.16 remote-as 65100
+   neighbor 172.31.100.16 description spine1-DC1_Ethernet6
+   neighbor 172.31.100.18 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.100.18 remote-as 65100
+   neighbor 172.31.100.18 description spine2-DC1_Ethernet6
    neighbor 192.168.100.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.100.1 remote-as 65100
    neighbor 192.168.100.1 description spine1-DC1
    neighbor 192.168.100.2 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.100.2 remote-as 65100
    neighbor 192.168.100.2 description spine2-DC1
-   neighbor 192.168.103.16 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.16 remote-as 65100
-   neighbor 192.168.103.16 description spine1-DC1_Ethernet6
-   neighbor 192.168.103.18 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.18 remote-as 65100
-   neighbor 192.168.103.18 description spine2-DC1_Ethernet6
    neighbor 192.168.200.7 peer group EVPN-OVERLAY-CORE
    neighbor 192.168.200.7 remote-as 65203
    neighbor 192.168.200.7 description BL1-DC2
@@ -464,17 +464,17 @@ router bgp 65103
       neighbor IPv4-UNDERLAY-PEERS activate
    !
    vrf BLUE
-      rd 192.168.100.5:20
+      rd 192.168.100.7:20
       route-target import evpn 20:20
       route-target export evpn 20:20
-      router-id 192.168.100.5
+      router-id 192.168.100.7
       redistribute connected
    !
    vrf RED
-      rd 192.168.100.5:10
+      rd 192.168.100.7:10
       route-target import evpn 10:10
       route-target export evpn 10:10
-      router-id 192.168.100.5
+      router-id 192.168.100.7
       redistribute connected
 ```
 
@@ -522,7 +522,7 @@ router bfd
 | Sequence | Action |
 | -------- | ------ |
 | 10 | permit 192.168.100.0/24 eq 32 |
-| 20 | permit 192.168.101.0/24 eq 32 |
+| 20 | permit 192.168.102.0/24 eq 32 |
 
 #### Prefix-lists Device Configuration
 
@@ -530,7 +530,7 @@ router bfd
 !
 ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
    seq 10 permit 192.168.100.0/24 eq 32
-   seq 20 permit 192.168.101.0/24 eq 32
+   seq 20 permit 192.168.102.0/24 eq 32
 ```
 
 ### Route-maps
@@ -575,13 +575,13 @@ vrf instance RED
 
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
-| BLUE | 10.255.20.5 |
-| RED | 10.255.10.5 |
+| BLUE | 10.255.20.7 |
+| RED | 10.255.10.7 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
-ip address virtual source-nat vrf BLUE address 10.255.20.5
-ip address virtual source-nat vrf RED address 10.255.10.5
+ip address virtual source-nat vrf BLUE address 10.255.20.7
+ip address virtual source-nat vrf RED address 10.255.10.7
 ```

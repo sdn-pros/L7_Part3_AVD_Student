@@ -377,7 +377,7 @@ ip route 0.0.0.0/0 192.168.0.1
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 172.31.200.16 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 172.31.200.18 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 192.168.100.5 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
+| 192.168.100.7 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 | 192.168.200.1 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.2 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 
@@ -437,9 +437,9 @@ router bgp 65203
    neighbor 172.31.200.18 peer group IPv4-UNDERLAY-PEERS
    neighbor 172.31.200.18 remote-as 65200
    neighbor 172.31.200.18 description spine2-DC2_Ethernet6
-   neighbor 192.168.100.5 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.100.5 remote-as 65103
-   neighbor 192.168.100.5 description BL1-DC1
+   neighbor 192.168.100.7 peer group EVPN-OVERLAY-CORE
+   neighbor 192.168.100.7 remote-as 65103
+   neighbor 192.168.100.7 description BL1-DC1
    neighbor 192.168.200.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.1 remote-as 65200
    neighbor 192.168.200.1 description spine1-DC2

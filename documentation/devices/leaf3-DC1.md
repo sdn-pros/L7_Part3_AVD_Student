@@ -222,8 +222,8 @@ vlan 4094
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet3 | P2P_LINK_TO_SPINE1-DC1_Ethernet4 | routed | - | 192.168.103.9/31 | default | 1500 | False | - | - |
-| Ethernet4 | P2P_LINK_TO_SPINE2-DC1_Ethernet4 | routed | - | 192.168.103.11/31 | default | 1500 | False | - | - |
+| Ethernet3 | P2P_LINK_TO_SPINE1-DC1_Ethernet4 | routed | - | 172.31.100.9/31 | default | 1500 | False | - | - |
+| Ethernet4 | P2P_LINK_TO_SPINE2-DC1_Ethernet4 | routed | - | 172.31.100.11/31 | default | 1500 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -244,14 +244,14 @@ interface Ethernet3
    no shutdown
    mtu 1500
    no switchport
-   ip address 192.168.103.9/31
+   ip address 172.31.100.9/31
 !
 interface Ethernet4
    description P2P_LINK_TO_SPINE2-DC1_Ethernet4
    no shutdown
    mtu 1500
    no switchport
-   ip address 192.168.103.11/31
+   ip address 172.31.100.11/31
 ```
 
 ### Port-Channel Interfaces
@@ -285,10 +285,10 @@ interface Port-Channel1
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.3/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.101.3/32 |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.3/32 |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.3/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.5/32 |
+| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.102.5/32 |
+| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.5/32 |
+| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.5/32 |
 
 ##### IPv6
 
@@ -307,24 +307,24 @@ interface Port-Channel1
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.100.3/32
+   ip address 192.168.100.5/32
 !
 interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
-   ip address 192.168.101.3/32
+   ip address 192.168.102.5/32
 !
 interface Loopback10
    description RED_VTEP_DIAGNOSTICS
    no shutdown
    vrf RED
-   ip address 10.255.10.3/32
+   ip address 10.255.10.5/32
 !
 interface Loopback20
    description BLUE_VTEP_DIAGNOSTICS
    no shutdown
    vrf BLUE
-   ip address 10.255.20.3/32
+   ip address 10.255.20.5/32
 ```
 
 ### VLAN Interfaces
@@ -491,7 +491,7 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65102|  192.168.100.3 |
+| 65102|  192.168.100.5 |
 
 | BGP Tuning |
 | ---------- |
@@ -537,10 +537,10 @@ ip route 0.0.0.0/0 192.168.0.1
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 10.255.250.5 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | default | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
+| 172.31.100.8 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 172.31.100.10 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.100.1 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.100.2 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 192.168.103.8 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 192.168.103.10 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -554,22 +554,22 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
-| 112 | 192.168.100.3:10112 | 10112:10112 | - | - | learned |
-| 113 | 192.168.100.3:10113 | 10113:10113 | - | - | learned |
+| 112 | 192.168.100.5:10112 | 10112:10112 | - | - | learned |
+| 113 | 192.168.100.5:10113 | 10113:10113 | - | - | learned |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| BLUE | 192.168.100.3:20 | connected |
-| RED | 192.168.100.3:10 | connected |
+| BLUE | 192.168.100.5:20 | connected |
+| RED | 192.168.100.5:10 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
 router bgp 65102
-   router-id 192.168.100.3
+   router-id 192.168.100.5
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -593,27 +593,27 @@ router bgp 65102
    neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
    neighbor 10.255.250.5 peer group MLAG-IPv4-UNDERLAY-PEER
    neighbor 10.255.250.5 description leaf4-DC1
+   neighbor 172.31.100.8 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.100.8 remote-as 65100
+   neighbor 172.31.100.8 description spine1-DC1_Ethernet4
+   neighbor 172.31.100.10 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.100.10 remote-as 65100
+   neighbor 172.31.100.10 description spine2-DC1_Ethernet4
    neighbor 192.168.100.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.100.1 remote-as 65100
    neighbor 192.168.100.1 description spine1-DC1
    neighbor 192.168.100.2 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.100.2 remote-as 65100
    neighbor 192.168.100.2 description spine2-DC1
-   neighbor 192.168.103.8 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.8 remote-as 65100
-   neighbor 192.168.103.8 description spine1-DC1_Ethernet4
-   neighbor 192.168.103.10 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.10 remote-as 65100
-   neighbor 192.168.103.10 description spine2-DC1_Ethernet4
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan 112
-      rd 192.168.100.3:10112
+      rd 192.168.100.5:10112
       route-target both 10112:10112
       redistribute learned
    !
    vlan 113
-      rd 192.168.100.3:10113
+      rd 192.168.100.5:10113
       route-target both 10113:10113
       redistribute learned
    !
@@ -629,17 +629,17 @@ router bgp 65102
       neighbor MLAG-IPv4-UNDERLAY-PEER activate
    !
    vrf BLUE
-      rd 192.168.100.3:20
+      rd 192.168.100.5:20
       route-target import evpn 20:20
       route-target export evpn 20:20
-      router-id 192.168.100.3
+      router-id 192.168.100.5
       redistribute connected
    !
    vrf RED
-      rd 192.168.100.3:10
+      rd 192.168.100.5:10
       route-target import evpn 10:10
       route-target export evpn 10:10
-      router-id 192.168.100.3
+      router-id 192.168.100.5
       redistribute connected
 ```
 
@@ -687,7 +687,7 @@ router bfd
 | Sequence | Action |
 | -------- | ------ |
 | 10 | permit 192.168.100.0/24 eq 32 |
-| 20 | permit 192.168.101.0/24 eq 32 |
+| 20 | permit 192.168.102.0/24 eq 32 |
 
 #### Prefix-lists Device Configuration
 
@@ -695,7 +695,7 @@ router bfd
 !
 ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
    seq 10 permit 192.168.100.0/24 eq 32
-   seq 20 permit 192.168.101.0/24 eq 32
+   seq 20 permit 192.168.102.0/24 eq 32
 ```
 
 ### Route-maps
@@ -750,13 +750,13 @@ vrf instance RED
 
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
-| BLUE | 10.255.20.3 |
-| RED | 10.255.10.3 |
+| BLUE | 10.255.20.5 |
+| RED | 10.255.10.5 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
-ip address virtual source-nat vrf BLUE address 10.255.20.3
-ip address virtual source-nat vrf RED address 10.255.10.3
+ip address virtual source-nat vrf BLUE address 10.255.20.5
+ip address virtual source-nat vrf RED address 10.255.10.5
 ```

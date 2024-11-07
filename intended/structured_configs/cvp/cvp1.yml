@@ -8,14 +8,6 @@ cvp_devices:
     parentContainerName: DC2_BORDER_LEAVES
     configlets:
       - AVD_BL1-DC2
-  - fqdn: BL2-DC1
-    parentContainerName: DC1_BORDER_LEAVES
-    configlets:
-      - AVD_BL2-DC1
-  - fqdn: BL2-DC2
-    parentContainerName: DC2_BORDER_LEAVES
-    configlets:
-      - AVD_BL2-DC2
   - fqdn: leaf1-DC1
     parentContainerName: DC1_LEAF1
     configlets:

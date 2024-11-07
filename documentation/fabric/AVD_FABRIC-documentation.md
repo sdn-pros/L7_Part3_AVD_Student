@@ -78,31 +78,31 @@
 
 | Uplink IPv4 Pool | Available Addresses | Assigned addresses | Assigned Address % |
 | ---------------- | ------------------- | ------------------ | ------------------ |
+| 172.31.100.0/24 | 256 | 20 | 7.82 % |
 | 172.31.200.0/24 | 256 | 20 | 7.82 % |
-| 192.168.103.0/24 | 256 | 20 | 7.82 % |
 
 ### Point-To-Point Links Node Allocation
 
 | Node | Node Interface | Node IP Address | Peer Node | Peer Interface | Peer IP Address |
 | ---- | -------------- | --------------- | --------- | -------------- | --------------- |
-| BL1-DC1 | Ethernet6 | 192.168.103.17/31 | spine1-DC1 | Ethernet6 | 192.168.103.16/31 |
-| BL1-DC1 | Ethernet7 | 192.168.103.19/31 | spine2-DC1 | Ethernet6 | 192.168.103.18/31 |
+| BL1-DC1 | Ethernet6 | 172.31.100.17/31 | spine1-DC1 | Ethernet6 | 172.31.100.16/31 |
+| BL1-DC1 | Ethernet7 | 172.31.100.19/31 | spine2-DC1 | Ethernet6 | 172.31.100.18/31 |
 | BL1-DC2 | Ethernet6 | 172.31.200.17/31 | spine1-DC2 | Ethernet6 | 172.31.200.16/31 |
 | BL1-DC2 | Ethernet7 | 172.31.200.19/31 | spine2-DC2 | Ethernet6 | 172.31.200.18/31 |
-| leaf1-DC1 | Ethernet3 | 192.168.103.1/31 | spine1-DC1 | Ethernet2 | 192.168.103.0/31 |
-| leaf1-DC1 | Ethernet4 | 192.168.103.3/31 | spine2-DC1 | Ethernet2 | 192.168.103.2/31 |
+| leaf1-DC1 | Ethernet3 | 172.31.100.1/31 | spine1-DC1 | Ethernet2 | 172.31.100.0/31 |
+| leaf1-DC1 | Ethernet4 | 172.31.100.3/31 | spine2-DC1 | Ethernet2 | 172.31.100.2/31 |
 | leaf1-DC2 | Ethernet3 | 172.31.200.1/31 | spine1-DC2 | Ethernet2 | 172.31.200.0/31 |
 | leaf1-DC2 | Ethernet4 | 172.31.200.3/31 | spine2-DC2 | Ethernet2 | 172.31.200.2/31 |
-| leaf2-DC1 | Ethernet3 | 192.168.103.5/31 | spine1-DC1 | Ethernet3 | 192.168.103.4/31 |
-| leaf2-DC1 | Ethernet4 | 192.168.103.7/31 | spine2-DC1 | Ethernet3 | 192.168.103.6/31 |
+| leaf2-DC1 | Ethernet3 | 172.31.100.5/31 | spine1-DC1 | Ethernet3 | 172.31.100.4/31 |
+| leaf2-DC1 | Ethernet4 | 172.31.100.7/31 | spine2-DC1 | Ethernet3 | 172.31.100.6/31 |
 | leaf2-DC2 | Ethernet3 | 172.31.200.5/31 | spine1-DC2 | Ethernet3 | 172.31.200.4/31 |
 | leaf2-DC2 | Ethernet4 | 172.31.200.7/31 | spine2-DC2 | Ethernet3 | 172.31.200.6/31 |
-| leaf3-DC1 | Ethernet3 | 192.168.103.9/31 | spine1-DC1 | Ethernet4 | 192.168.103.8/31 |
-| leaf3-DC1 | Ethernet4 | 192.168.103.11/31 | spine2-DC1 | Ethernet4 | 192.168.103.10/31 |
+| leaf3-DC1 | Ethernet3 | 172.31.100.9/31 | spine1-DC1 | Ethernet4 | 172.31.100.8/31 |
+| leaf3-DC1 | Ethernet4 | 172.31.100.11/31 | spine2-DC1 | Ethernet4 | 172.31.100.10/31 |
 | leaf3-DC2 | Ethernet3 | 172.31.200.9/31 | spine1-DC2 | Ethernet4 | 172.31.200.8/31 |
 | leaf3-DC2 | Ethernet4 | 172.31.200.11/31 | spine2-DC2 | Ethernet4 | 172.31.200.10/31 |
-| leaf4-DC1 | Ethernet3 | 192.168.103.13/31 | spine1-DC1 | Ethernet5 | 192.168.103.12/31 |
-| leaf4-DC1 | Ethernet4 | 192.168.103.15/31 | spine2-DC1 | Ethernet5 | 192.168.103.14/31 |
+| leaf4-DC1 | Ethernet3 | 172.31.100.13/31 | spine1-DC1 | Ethernet5 | 172.31.100.12/31 |
+| leaf4-DC1 | Ethernet4 | 172.31.100.15/31 | spine2-DC1 | Ethernet5 | 172.31.100.14/31 |
 | leaf4-DC2 | Ethernet3 | 172.31.200.13/31 | spine1-DC2 | Ethernet5 | 172.31.200.12/31 |
 | leaf4-DC2 | Ethernet4 | 172.31.200.15/31 | spine2-DC2 | Ethernet5 | 172.31.200.14/31 |
 
@@ -117,15 +117,15 @@
 
 | POD | Node | Loopback0 |
 | --- | ---- | --------- |
-| DC1 | BL1-DC1 | 192.168.100.5/32 |
+| DC1 | BL1-DC1 | 192.168.100.7/32 |
 | DC2 | BL1-DC2 | 192.168.200.7/32 |
-| DC1 | leaf1-DC1 | 192.168.100.1/32 |
+| DC1 | leaf1-DC1 | 192.168.100.3/32 |
 | DC2 | leaf1-DC2 | 192.168.200.3/32 |
-| DC1 | leaf2-DC1 | 192.168.100.2/32 |
+| DC1 | leaf2-DC1 | 192.168.100.4/32 |
 | DC2 | leaf2-DC2 | 192.168.200.4/32 |
-| DC1 | leaf3-DC1 | 192.168.100.3/32 |
+| DC1 | leaf3-DC1 | 192.168.100.5/32 |
 | DC2 | leaf3-DC2 | 192.168.200.5/32 |
-| DC1 | leaf4-DC1 | 192.168.100.4/32 |
+| DC1 | leaf4-DC1 | 192.168.100.6/32 |
 | DC2 | leaf4-DC2 | 192.168.200.6/32 |
 | DC1 | spine1-DC1 | 192.168.100.1/32 |
 | DC2 | spine1-DC2 | 192.168.200.1/32 |
@@ -136,20 +136,20 @@
 
 | VTEP Loopback Pool | Available Addresses | Assigned addresses | Assigned Address % |
 | --------------------- | ------------------- | ------------------ | ------------------ |
-| 192.168.101.0/24 | 256 | 5 | 1.96 % |
+| 192.168.102.0/24 | 256 | 5 | 1.96 % |
 | 192.168.202.0/24 | 256 | 5 | 1.96 % |
 
 ### VTEP Loopback Node allocation
 
 | POD | Node | Loopback1 |
 | --- | ---- | --------- |
-| DC1 | BL1-DC1 | 192.168.101.5/32 |
+| DC1 | BL1-DC1 | 192.168.102.7/32 |
 | DC2 | BL1-DC2 | 192.168.202.7/32 |
-| DC1 | leaf1-DC1 | 192.168.101.1/32 |
+| DC1 | leaf1-DC1 | 192.168.102.3/32 |
 | DC2 | leaf1-DC2 | 192.168.202.3/32 |
-| DC1 | leaf2-DC1 | 192.168.101.1/32 |
+| DC1 | leaf2-DC1 | 192.168.102.3/32 |
 | DC2 | leaf2-DC2 | 192.168.202.3/32 |
-| DC1 | leaf3-DC1 | 192.168.101.3/32 |
+| DC1 | leaf3-DC1 | 192.168.102.5/32 |
 | DC2 | leaf3-DC2 | 192.168.202.5/32 |
-| DC1 | leaf4-DC1 | 192.168.101.3/32 |
+| DC1 | leaf4-DC1 | 192.168.102.5/32 |
 | DC2 | leaf4-DC2 | 192.168.202.5/32 |

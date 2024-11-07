@@ -1,7 +1,7 @@
 hostname: BL1-DC1
 router_bgp:
   as: '65103'
-  router_id: 192.168.100.5
+  router_id: 192.168.100.7
   distance:
     external_routes: 20
     internal_routes: 200
@@ -46,11 +46,11 @@ router_bgp:
   - source_protocol: connected
     route_map: RM-CONN-2-BGP
   neighbors:
-  - ip_address: 192.168.103.16
+  - ip_address: 172.31.100.16
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65100'
     description: spine1-DC1_Ethernet6
-  - ip_address: 192.168.103.18
+  - ip_address: 172.31.100.18
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65100'
     description: spine2-DC1_Ethernet6
@@ -85,8 +85,8 @@ router_bgp:
       activate: true
   vrfs:
   - name: BLUE
-    router_id: 192.168.100.5
-    rd: 192.168.100.5:20
+    router_id: 192.168.100.7
+    rd: 192.168.100.7:20
     route_targets:
       import:
       - address_family: evpn
@@ -99,8 +99,8 @@ router_bgp:
     redistribute_routes:
     - source_protocol: connected
   - name: RED
-    router_id: 192.168.100.5
-    rd: 192.168.100.5:10
+    router_id: 192.168.100.7
+    rd: 192.168.100.7:10
     route_targets:
       import:
       - address_family: evpn
@@ -158,7 +158,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.17/31
+  ip_address: 172.31.100.17/31
 - name: Ethernet7
   peer: spine2-DC1
   peer_interface: Ethernet6
@@ -167,33 +167,33 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.19/31
+  ip_address: 172.31.100.19/31
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
   shutdown: false
-  ip_address: 192.168.100.5/32
+  ip_address: 192.168.100.7/32
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
-  ip_address: 192.168.101.5/32
+  ip_address: 192.168.102.7/32
 - name: Loopback20
   description: BLUE_VTEP_DIAGNOSTICS
   shutdown: false
   vrf: BLUE
-  ip_address: 10.255.20.5/32
+  ip_address: 10.255.20.7/32
 - name: Loopback10
   description: RED_VTEP_DIAGNOSTICS
   shutdown: false
   vrf: RED
-  ip_address: 10.255.10.5/32
+  ip_address: 10.255.10.7/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
   - sequence: 10
     action: permit 192.168.100.0/24 eq 32
   - sequence: 20
-    action: permit 192.168.101.0/24 eq 32
+    action: permit 192.168.102.0/24 eq 32
 route_maps:
 - name: RM-CONN-2-BGP
   sequence_numbers:
@@ -222,6 +222,6 @@ vxlan_interface:
         vni: 10
 virtual_source_nat_vrfs:
 - name: BLUE
-  ip_address: 10.255.20.5
+  ip_address: 10.255.20.7
 - name: RED
-  ip_address: 10.255.10.5
+  ip_address: 10.255.10.7

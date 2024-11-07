@@ -38,43 +38,43 @@ router_bgp:
   - source_protocol: connected
     route_map: RM-CONN-2-BGP
   neighbors:
-  - ip_address: 192.168.103.1
+  - ip_address: 172.31.100.1
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65101'
     description: leaf1-DC1_Ethernet3
-  - ip_address: 192.168.103.5
+  - ip_address: 172.31.100.5
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65101'
     description: leaf2-DC1_Ethernet3
-  - ip_address: 192.168.103.9
+  - ip_address: 172.31.100.9
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65102'
     description: leaf3-DC1_Ethernet3
-  - ip_address: 192.168.103.13
+  - ip_address: 172.31.100.13
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65102'
     description: leaf4-DC1_Ethernet3
-  - ip_address: 192.168.103.17
+  - ip_address: 172.31.100.17
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65103'
     description: BL1-DC1_Ethernet6
-  - ip_address: 192.168.100.5
+  - ip_address: 192.168.100.7
     peer_group: EVPN-OVERLAY-PEERS
     description: BL1-DC1
     remote_as: '65103'
-  - ip_address: 192.168.100.1
+  - ip_address: 192.168.100.3
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf1-DC1
     remote_as: '65101'
-  - ip_address: 192.168.100.2
+  - ip_address: 192.168.100.4
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf2-DC1
     remote_as: '65101'
-  - ip_address: 192.168.100.3
+  - ip_address: 192.168.100.5
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf3-DC1
     remote_as: '65102'
-  - ip_address: 192.168.100.4
+  - ip_address: 192.168.100.6
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf4-DC1
     remote_as: '65102'
@@ -125,7 +125,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.0/31
+  ip_address: 172.31.100.0/31
 - name: Ethernet3
   peer: leaf2-DC1
   peer_interface: Ethernet3
@@ -134,7 +134,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.4/31
+  ip_address: 172.31.100.4/31
 - name: Ethernet4
   peer: leaf3-DC1
   peer_interface: Ethernet3
@@ -143,7 +143,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.8/31
+  ip_address: 172.31.100.8/31
 - name: Ethernet5
   peer: leaf4-DC1
   peer_interface: Ethernet3
@@ -152,7 +152,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.12/31
+  ip_address: 172.31.100.12/31
 - name: Ethernet6
   peer: BL1-DC1
   peer_interface: Ethernet6
@@ -161,7 +161,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 192.168.103.16/31
+  ip_address: 172.31.100.16/31
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering

@@ -62,7 +62,7 @@ router_bgp:
     peer_group: EVPN-OVERLAY-PEERS
     description: spine2-DC2
     remote_as: '65200'
-  - ip_address: 192.168.100.5
+  - ip_address: 192.168.100.7
     peer_group: EVPN-OVERLAY-CORE
     description: BL1-DC1
     remote_as: '65103'
