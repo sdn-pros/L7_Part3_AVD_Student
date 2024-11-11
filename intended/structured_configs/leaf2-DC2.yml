@@ -1,7 +1,7 @@
 hostname: leaf2-DC2
 router_bgp:
   as: '65201'
-  router_id: 192.168.200.4
+  router_id: 192.168.255.4
   distance:
     external_routes: 20
     internal_routes: 200
@@ -76,8 +76,8 @@ router_bgp:
       activate: true
   vrfs:
   - name: VRF_A
-    router_id: 192.168.200.4
-    rd: 192.168.200.4:19
+    router_id: 192.168.255.4
+    rd: 192.168.255.4:19
     route_targets:
       import:
       - address_family: evpn
@@ -90,8 +90,8 @@ router_bgp:
     redistribute_routes:
     - source_protocol: connected
   - name: VRF_B
-    router_id: 192.168.200.4
-    rd: 192.168.200.4:20
+    router_id: 192.168.255.4
+    rd: 192.168.255.4:20
     route_targets:
       import:
       - address_family: evpn
@@ -106,7 +106,7 @@ router_bgp:
   vlans:
   - id: 120
     tenant: Tenant_A
-    rd: 192.168.200.4:10139
+    rd: 192.168.255.4:10139
     route_targets:
       both:
       - 10139:10139
@@ -114,7 +114,7 @@ router_bgp:
     - learned
   - id: 121
     tenant: Tenant_A
-    rd: 192.168.200.4:10140
+    rd: 192.168.255.4:10140
     route_targets:
       both:
       - 10140:10140
@@ -276,11 +276,7 @@ loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
   shutdown: false
-  ip_address: 192.168.200.4/32
-- name: Loopback1
-  description: VTEP_VXLAN_Tunnel_Source
-  shutdown: false
-  ip_address: 192.168.202.3/32
+  ip_address: 192.168.255.4/32
 - name: Loopback10
   description: VRF_A_VTEP_DIAGNOSTICS
   shutdown: false
@@ -295,9 +291,7 @@ prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
   - sequence: 10
-    action: permit 192.168.200.0/24 eq 32
-  - sequence: 20
-    action: permit 192.168.202.0/24 eq 32
+    action: permit 192.168.255.0/24 eq 32
 router_bfd:
   multihop:
     interval: 300
@@ -311,7 +305,7 @@ vxlan_interface:
     description: leaf2-DC2_VTEP
     vxlan:
       udp_port: 4789
-      source_interface: Loopback1
+      source_interface: Loopback0
       virtual_router_encapsulation_mac_address: mlag-system-id
       vlans:
       - id: 120

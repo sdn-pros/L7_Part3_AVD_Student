@@ -35,9 +35,11 @@ l3leaf:
     virtual_router_mac_address: 00:00:00:00:00:01
     spanning_tree_mode: mstp
     spanning_tree_priority: 4096
-    loopback_ipv4_pool: 192.168.100.0/24
+    loopback_ipv4_pool: 192.168.255.0/24
     loopback_ipv4_offset: 2
-    vtep_loopback_ipv4_pool: 192.168.102.0/24
+    vtep_loopback_ipv4_pool: 3.3.0.0/24
+    vtep_loopback: Loopback0
+
 
     uplink_interfaces: [Ethernet3, Ethernet4]
     uplink_switches: [spine1-DC1, spine2-DC1]
@@ -46,6 +48,7 @@ l3leaf:
     mlag_interfaces: [Ethernet1, Ethernet2]
     mlag_peer_ipv4_pool: 10.255.249.0/24
     mlag_peer_l3_ipv4_pool: 10.255.250.0/24
+
 
   
   node_groups:
@@ -56,6 +59,7 @@ l3leaf:
           - Tenant_A
         tags:
           - dc1_pod1
+ 
       nodes:
         - name: leaf1-DC1
           id: 1

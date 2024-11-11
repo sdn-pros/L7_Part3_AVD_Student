@@ -286,8 +286,7 @@ interface Port-Channel1
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.6/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.102.5/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.255.6/32 |
 | Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | 10.255.10.6/32 |
 | Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | 10.255.20.6/32 |
 
@@ -296,7 +295,6 @@ interface Port-Channel1
 | Interface | Description | VRF | IPv6 Address |
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
 | Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | - |
 | Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | - |
 
@@ -308,12 +306,7 @@ interface Port-Channel1
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.100.6/32
-!
-interface Loopback1
-   description VTEP_VXLAN_Tunnel_Source
-   no shutdown
-   ip address 192.168.102.5/32
+   ip address 192.168.255.6/32
 !
 interface Loopback10
    description VRF_A_VTEP_DIAGNOSTICS
@@ -384,7 +377,7 @@ interface Vlan4094
 
 | Setting | Value |
 | ------- | ----- |
-| Source Interface | Loopback1 |
+| Source Interface | Loopback0 |
 | UDP port | 4789 |
 | EVPN MLAG Shared Router MAC | mlag-system-id |
 
@@ -408,7 +401,7 @@ interface Vlan4094
 !
 interface Vxlan1
    description leaf4-DC1_VTEP
-   vxlan source-interface Loopback1
+   vxlan source-interface Loopback0
    vxlan virtual-router encapsulation mac-address mlag-system-id
    vxlan udp-port 4789
    vxlan vlan 112 vni 10131
@@ -494,7 +487,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65102|  192.168.100.6 |
+| 65102|  192.168.255.6 |
 
 | BGP Tuning |
 | ---------- |
@@ -557,22 +550,22 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
-| 112 | 192.168.100.6:10131 | 10131:10131 | - | - | learned |
-| 113 | 192.168.100.6:10132 | 10132:10132 | - | - | learned |
+| 112 | 192.168.255.6:10131 | 10131:10131 | - | - | learned |
+| 113 | 192.168.255.6:10132 | 10132:10132 | - | - | learned |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| VRF_A | 192.168.100.6:19 | connected |
-| VRF_B | 192.168.100.6:20 | connected |
+| VRF_A | 192.168.255.6:19 | connected |
+| VRF_B | 192.168.255.6:20 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
 router bgp 65102
-   router-id 192.168.100.6
+   router-id 192.168.255.6
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -611,12 +604,12 @@ router bgp 65102
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan 112
-      rd 192.168.100.6:10131
+      rd 192.168.255.6:10131
       route-target both 10131:10131
       redistribute learned
    !
    vlan 113
-      rd 192.168.100.6:10132
+      rd 192.168.255.6:10132
       route-target both 10132:10132
       redistribute learned
    !
@@ -632,17 +625,17 @@ router bgp 65102
       neighbor MLAG-IPv4-UNDERLAY-PEER activate
    !
    vrf VRF_A
-      rd 192.168.100.6:19
+      rd 192.168.255.6:19
       route-target import evpn 19:19
       route-target export evpn 19:19
-      router-id 192.168.100.6
+      router-id 192.168.255.6
       redistribute connected
    !
    vrf VRF_B
-      rd 192.168.100.6:20
+      rd 192.168.255.6:20
       route-target import evpn 20:20
       route-target export evpn 20:20
-      router-id 192.168.100.6
+      router-id 192.168.255.6
       redistribute connected
 ```
 
@@ -689,16 +682,14 @@ router bfd
 
 | Sequence | Action |
 | -------- | ------ |
-| 10 | permit 192.168.100.0/24 eq 32 |
-| 20 | permit 192.168.102.0/24 eq 32 |
+| 10 | permit 192.168.255.0/24 eq 32 |
 
 #### Prefix-lists Device Configuration
 
 ```eos
 !
 ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
-   seq 10 permit 192.168.100.0/24 eq 32
-   seq 20 permit 192.168.102.0/24 eq 32
+   seq 10 permit 192.168.255.0/24 eq 32
 ```
 
 ### Route-maps

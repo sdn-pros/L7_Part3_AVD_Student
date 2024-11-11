@@ -185,8 +185,7 @@ interface Ethernet7
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.200.8/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.202.8/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.255.8/32 |
 | Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | 10.255.10.8/32 |
 | Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | 10.255.20.8/32 |
 
@@ -195,7 +194,6 @@ interface Ethernet7
 | Interface | Description | VRF | IPv6 Address |
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
 | Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | - |
 | Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | - |
 
@@ -207,12 +205,7 @@ interface Ethernet7
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.200.8/32
-!
-interface Loopback1
-   description VTEP_VXLAN_Tunnel_Source
-   no shutdown
-   ip address 192.168.202.8/32
+   ip address 192.168.255.8/32
 !
 interface Loopback10
    description VRF_A_VTEP_DIAGNOSTICS
@@ -233,7 +226,7 @@ interface Loopback20
 
 | Setting | Value |
 | ------- | ----- |
-| Source Interface | Loopback1 |
+| Source Interface | Loopback0 |
 | UDP port | 4789 |
 
 ##### VRF to VNI and Multicast Group Mappings
@@ -249,7 +242,7 @@ interface Loopback20
 !
 interface Vxlan1
    description BL1-DC2_VTEP
-   vxlan source-interface Loopback1
+   vxlan source-interface Loopback0
    vxlan udp-port 4789
    vxlan vrf VRF_A vni 19
    vxlan vrf VRF_B vni 20
@@ -332,7 +325,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65300|  192.168.200.8 |
+| 65300|  192.168.255.8 |
 
 | BGP Tuning |
 | ---------- |
@@ -380,9 +373,9 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 172.31.200.20 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 172.31.200.22 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 192.168.100.7 | 65300 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 | 192.168.200.1 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.2 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 192.168.255.7 | 65300 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -405,15 +398,15 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| VRF_A | 192.168.200.8:19 | connected |
-| VRF_B | 192.168.200.8:20 | connected |
+| VRF_A | 192.168.255.8:19 | connected |
+| VRF_B | 192.168.255.8:20 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
 router bgp 65300
-   router-id 192.168.200.8
+   router-id 192.168.255.8
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -440,15 +433,15 @@ router bgp 65300
    neighbor 172.31.200.22 peer group IPv4-UNDERLAY-PEERS
    neighbor 172.31.200.22 remote-as 65200
    neighbor 172.31.200.22 description spine2-DC2_Ethernet6
-   neighbor 192.168.100.7 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.100.7 remote-as 65300
-   neighbor 192.168.100.7 description BL1-DC1
    neighbor 192.168.200.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.1 remote-as 65200
    neighbor 192.168.200.1 description spine1-DC2
    neighbor 192.168.200.2 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.2 remote-as 65200
    neighbor 192.168.200.2 description spine2-DC2
+   neighbor 192.168.255.7 peer group EVPN-OVERLAY-CORE
+   neighbor 192.168.255.7 remote-as 65300
+   neighbor 192.168.255.7 description BL1-DC1
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn
@@ -467,17 +460,17 @@ router bgp 65300
       neighbor IPv4-UNDERLAY-PEERS activate
    !
    vrf VRF_A
-      rd 192.168.200.8:19
+      rd 192.168.255.8:19
       route-target import evpn 19:19
       route-target export evpn 19:19
-      router-id 192.168.200.8
+      router-id 192.168.255.8
       redistribute connected
    !
    vrf VRF_B
-      rd 192.168.200.8:20
+      rd 192.168.255.8:20
       route-target import evpn 20:20
       route-target export evpn 20:20
-      router-id 192.168.200.8
+      router-id 192.168.255.8
       redistribute connected
 ```
 
@@ -524,16 +517,14 @@ router bfd
 
 | Sequence | Action |
 | -------- | ------ |
-| 10 | permit 192.168.200.0/24 eq 32 |
-| 20 | permit 192.168.202.0/24 eq 32 |
+| 10 | permit 192.168.255.0/24 eq 32 |
 
 #### Prefix-lists Device Configuration
 
 ```eos
 !
 ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
-   seq 10 permit 192.168.200.0/24 eq 32
-   seq 20 permit 192.168.202.0/24 eq 32
+   seq 10 permit 192.168.255.0/24 eq 32
 ```
 
 ### Route-maps

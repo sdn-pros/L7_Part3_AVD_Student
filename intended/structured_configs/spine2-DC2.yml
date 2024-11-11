@@ -58,23 +58,23 @@ router_bgp:
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65300'
     description: BL1-DC2_Ethernet7
-  - ip_address: 192.168.200.8
+  - ip_address: 192.168.255.8
     peer_group: EVPN-OVERLAY-PEERS
     description: BL1-DC2
     remote_as: '65300'
-  - ip_address: 192.168.200.3
+  - ip_address: 192.168.255.3
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf1-DC2
     remote_as: '65201'
-  - ip_address: 192.168.200.4
+  - ip_address: 192.168.255.4
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf2-DC2
     remote_as: '65201'
-  - ip_address: 192.168.200.5
+  - ip_address: 192.168.255.5
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf3-DC2
     remote_as: '65202'
-  - ip_address: 192.168.200.6
+  - ip_address: 192.168.255.6
     peer_group: EVPN-OVERLAY-PEERS
     description: leaf4-DC2
     remote_as: '65202'
