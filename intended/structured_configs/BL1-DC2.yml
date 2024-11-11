@@ -1,7 +1,7 @@
 hostname: BL1-DC2
 router_bgp:
-  as: '65203'
-  router_id: 192.168.200.7
+  as: '65300'
+  router_id: 192.168.200.8
   distance:
     external_routes: 20
     internal_routes: 200
@@ -46,11 +46,11 @@ router_bgp:
   - source_protocol: connected
     route_map: RM-CONN-2-BGP
   neighbors:
-  - ip_address: 172.31.200.16
+  - ip_address: 172.31.200.20
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65200'
     description: spine1-DC2_Ethernet6
-  - ip_address: 172.31.200.18
+  - ip_address: 172.31.200.22
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65200'
     description: spine2-DC2_Ethernet6
@@ -65,7 +65,7 @@ router_bgp:
   - ip_address: 192.168.100.7
     peer_group: EVPN-OVERLAY-CORE
     description: BL1-DC1
-    remote_as: '65103'
+    remote_as: '65300'
   address_family_evpn:
     neighbor_default:
       next_hop_self_received_evpn_routes:
@@ -84,36 +84,36 @@ router_bgp:
     - name: EVPN-OVERLAY-PEERS
       activate: true
   vrfs:
-  - name: BLUE
-    router_id: 192.168.200.7
-    rd: 192.168.200.7:20
+  - name: VRF_A
+    router_id: 192.168.200.8
+    rd: 192.168.200.8:19
     route_targets:
       import:
       - address_family: evpn
         route_targets:
-        - '20:20'
+        - '19:19'
       export:
       - address_family: evpn
         route_targets:
-        - '20:20'
+        - '19:19'
     redistribute_routes:
     - source_protocol: connected
-  - name: RED
-    router_id: 192.168.200.7
-    rd: 192.168.200.7:10
+  - name: VRF_B
+    router_id: 192.168.200.8
+    rd: 192.168.200.8:20
     route_targets:
       import:
       - address_family: evpn
         route_targets:
-        - '10:10'
+        - '20:20'
       export:
       - address_family: evpn
         route_targets:
-        - '10:10'
+        - '20:20'
     redistribute_routes:
     - source_protocol: connected
 static_routes:
-- vrf: default
+- vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
   gateway: 192.168.0.1
 service_routing_protocols_model: multi-agent
@@ -129,25 +129,25 @@ spanning_tree:
   - id: '0'
     priority: 4096
 vrfs:
-- name: default
-  ip_routing: false
-- name: BLUE
+- name: MGMT
+  ip_routing: true
+- name: VRF_A
   tenant: Tenant_A
   ip_routing: true
-- name: RED
+- name: VRF_B
   tenant: Tenant_A
   ip_routing: true
 management_interfaces:
 - name: Management0
   description: oob_management
   shutdown: false
-  vrf: default
+  vrf: MGMT
   ip_address: 192.168.0.95/24
   gateway: 192.168.0.1
   type: oob
 management_api_http:
   enable_vrfs:
-  - name: default
+  - name: MGMT
   enable_https: true
 ethernet_interfaces:
 - name: Ethernet6
@@ -158,7 +158,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 172.31.200.17/31
+  ip_address: 172.31.200.21/31
 - name: Ethernet7
   peer: spine2-DC2
   peer_interface: Ethernet6
@@ -167,26 +167,26 @@ ethernet_interfaces:
   shutdown: false
   mtu: 1500
   type: routed
-  ip_address: 172.31.200.19/31
+  ip_address: 172.31.200.23/31
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
   shutdown: false
-  ip_address: 192.168.200.7/32
+  ip_address: 192.168.200.8/32
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
-  ip_address: 192.168.202.7/32
-- name: Loopback20
-  description: BLUE_VTEP_DIAGNOSTICS
-  shutdown: false
-  vrf: BLUE
-  ip_address: 10.255.20.7/32
+  ip_address: 192.168.202.8/32
 - name: Loopback10
-  description: RED_VTEP_DIAGNOSTICS
+  description: VRF_A_VTEP_DIAGNOSTICS
   shutdown: false
-  vrf: RED
-  ip_address: 10.255.10.7/32
+  vrf: VRF_A
+  ip_address: 10.255.10.8/32
+- name: Loopback20
+  description: VRF_B_VTEP_DIAGNOSTICS
+  shutdown: false
+  vrf: VRF_B
+  ip_address: 10.255.20.8/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -216,12 +216,12 @@ vxlan_interface:
       udp_port: 4789
       source_interface: Loopback1
       vrfs:
-      - name: BLUE
+      - name: VRF_A
+        vni: 19
+      - name: VRF_B
         vni: 20
-      - name: RED
-        vni: 10
 virtual_source_nat_vrfs:
-- name: BLUE
-  ip_address: 10.255.20.7
-- name: RED
-  ip_address: 10.255.10.7
+- name: VRF_A
+  ip_address: 10.255.10.8
+- name: VRF_B
+  ip_address: 10.255.20.8

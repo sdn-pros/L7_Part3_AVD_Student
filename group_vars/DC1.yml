@@ -3,6 +3,7 @@ dc_name: DC1
 
 evpn_overlay_bgp_rtc: true
 
+
 spine:
   defaults:
     platform: cEOS
@@ -45,6 +46,7 @@ l3leaf:
     mlag_interfaces: [Ethernet1, Ethernet2]
     mlag_peer_ipv4_pool: 10.255.249.0/24
     mlag_peer_l3_ipv4_pool: 10.255.250.0/24
+
   
   node_groups:
     - group: DC1_LEAF1
@@ -86,7 +88,7 @@ l3leaf:
 
   
     - group: DC1_BORDER_LEAVES
-      bgp_as: '65103'
+      bgp_as: '65300'
       filter:
         tenants:
           - Tenant_A
@@ -103,7 +105,7 @@ l3leaf:
       
       nodes:
         - name: BL1-DC1
-          bgp_as: 65103
+          bgp_as: 65300
           id: 5
           mgmt_ip: 192.168.0.91/24
           uplink_interfaces: [ Ethernet6, Ethernet7]
@@ -111,4 +113,3 @@ l3leaf:
           uplink_switch_interfaces: [Ethernet6, Ethernet6]
           
 
-   

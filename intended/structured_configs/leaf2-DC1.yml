@@ -75,7 +75,21 @@ router_bgp:
     - name: EVPN-OVERLAY-PEERS
       activate: true
   vrfs:
-  - name: BLUE
+  - name: VRF_A
+    router_id: 192.168.100.4
+    rd: 192.168.100.4:19
+    route_targets:
+      import:
+      - address_family: evpn
+        route_targets:
+        - '19:19'
+      export:
+      - address_family: evpn
+        route_targets:
+        - '19:19'
+    redistribute_routes:
+    - source_protocol: connected
+  - name: VRF_B
     router_id: 192.168.100.4
     rd: 192.168.100.4:20
     route_targets:
@@ -89,39 +103,25 @@ router_bgp:
         - '20:20'
     redistribute_routes:
     - source_protocol: connected
-  - name: RED
-    router_id: 192.168.100.4
-    rd: 192.168.100.4:10
-    route_targets:
-      import:
-      - address_family: evpn
-        route_targets:
-        - '10:10'
-      export:
-      - address_family: evpn
-        route_targets:
-        - '10:10'
-    redistribute_routes:
-    - source_protocol: connected
   vlans:
-  - id: 111
-    tenant: Tenant_A
-    rd: 192.168.100.4:10111
-    route_targets:
-      both:
-      - 10111:10111
-    redistribute_routes:
-    - learned
   - id: 110
     tenant: Tenant_A
-    rd: 192.168.100.4:10110
+    rd: 192.168.100.4:10129
     route_targets:
       both:
-      - 10110:10110
+      - 10129:10129
+    redistribute_routes:
+    - learned
+  - id: 111
+    tenant: Tenant_A
+    rd: 192.168.100.4:10130
+    route_targets:
+      both:
+      - 10130:10130
     redistribute_routes:
     - learned
 static_routes:
-- vrf: default
+- vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
   gateway: 192.168.0.1
 service_routing_protocols_model: multi-agent
@@ -138,25 +138,25 @@ spanning_tree:
     priority: 4096
   no_spanning_tree_vlan: 4093-4094
 vrfs:
-- name: default
-  ip_routing: false
-- name: BLUE
+- name: MGMT
+  ip_routing: true
+- name: VRF_A
   tenant: Tenant_A
   ip_routing: true
-- name: RED
+- name: VRF_B
   tenant: Tenant_A
   ip_routing: true
 management_interfaces:
 - name: Management0
   description: oob_management
   shutdown: false
-  vrf: default
+  vrf: MGMT
   ip_address: 192.168.0.22/24
   gateway: 192.168.0.1
   type: oob
 management_api_http:
   enable_vrfs:
-  - name: default
+  - name: MGMT
   enable_https: true
 vlans:
 - id: 4093
@@ -169,11 +169,11 @@ vlans:
   name: MLAG_PEER
   trunk_groups:
   - MLAG
-- id: 111
-  name: VRF_BLUE_VLAN_111
-  tenant: Tenant_A
 - id: 110
-  name: VRF_RED_VLAN_110
+  name: VRF_A_VLAN_110
+  tenant: Tenant_A
+- id: 111
+  name: VRF_B_VLAN_111
   tenant: Tenant_A
 vlan_interfaces:
 - name: Vlan4093
@@ -187,22 +187,22 @@ vlan_interfaces:
   ip_address: 10.255.249.1/31
   no_autostate: true
   mtu: 1500
-- name: Vlan111
-  tenant: Tenant_A
-  tags:
-  - dc1_pod1
-  description: VRF_BLUE_VLAN_111
-  shutdown: false
-  ip_address_virtual: 10.1.11.1/24
-  vrf: BLUE
 - name: Vlan110
   tenant: Tenant_A
   tags:
   - dc1_pod1
-  description: VRF_RED_VLAN_110
+  description: VRF_A_VLAN_110
   shutdown: false
   ip_address_virtual: 10.1.10.1/24
-  vrf: RED
+  vrf: VRF_A
+- name: Vlan111
+  tenant: Tenant_A
+  tags:
+  - dc1_pod1
+  description: VRF_B_VLAN_111
+  shutdown: false
+  ip_address_virtual: 10.1.11.1/24
+  vrf: VRF_B
 port_channel_interfaces:
 - name: Port-Channel1
   description: MLAG_PEER_leaf1-DC1_Po1
@@ -281,16 +281,16 @@ loopback_interfaces:
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
   ip_address: 192.168.102.3/32
-- name: Loopback20
-  description: BLUE_VTEP_DIAGNOSTICS
-  shutdown: false
-  vrf: BLUE
-  ip_address: 10.255.20.4/32
 - name: Loopback10
-  description: RED_VTEP_DIAGNOSTICS
+  description: VRF_A_VTEP_DIAGNOSTICS
   shutdown: false
-  vrf: RED
+  vrf: VRF_A
   ip_address: 10.255.10.4/32
+- name: Loopback20
+  description: VRF_B_VTEP_DIAGNOSTICS
+  shutdown: false
+  vrf: VRF_B
+  ip_address: 10.255.20.4/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -314,17 +314,17 @@ vxlan_interface:
       source_interface: Loopback1
       virtual_router_encapsulation_mac_address: mlag-system-id
       vlans:
-      - id: 111
-        vni: 10111
       - id: 110
-        vni: 10110
+        vni: 10129
+      - id: 111
+        vni: 10130
       vrfs:
-      - name: BLUE
+      - name: VRF_A
+        vni: 19
+      - name: VRF_B
         vni: 20
-      - name: RED
-        vni: 10
 virtual_source_nat_vrfs:
-- name: BLUE
-  ip_address: 10.255.20.4
-- name: RED
+- name: VRF_A
   ip_address: 10.255.10.4
+- name: VRF_B
+  ip_address: 10.255.20.4

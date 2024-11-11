@@ -47,13 +47,13 @@
 
 | Management Interface | description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
-| Management0 | oob_management | oob | default | 192.168.0.95/24 | 192.168.0.1 |
+| Management0 | oob_management | oob | MGMT | 192.168.0.95/24 | 192.168.0.1 |
 
 ##### IPv6
 
 | Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
 | -------------------- | ----------- | ---- | --- | ------------ | ------------ |
-| Management0 | oob_management | oob | default | - | - |
+| Management0 | oob_management | oob | MGMT | - | - |
 
 #### Management Interfaces Device Configuration
 
@@ -62,6 +62,7 @@
 interface Management0
    description oob_management
    no shutdown
+   vrf MGMT
    ip address 192.168.0.95/24
 ```
 
@@ -88,7 +89,7 @@ dns domain atd.lab
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
-| default | - | - |
+| MGMT | - | - |
 
 #### Management API HTTP Configuration
 
@@ -98,7 +99,7 @@ management api http-commands
    protocol https
    no shutdown
    !
-   vrf default
+   vrf MGMT
       no shutdown
 ```
 
@@ -154,8 +155,8 @@ vlan internal order ascending range 1006 1199
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet6 | P2P_LINK_TO_SPINE1-DC2_Ethernet6 | routed | - | 172.31.200.17/31 | default | 1500 | False | - | - |
-| Ethernet7 | P2P_LINK_TO_SPINE2-DC2_Ethernet6 | routed | - | 172.31.200.19/31 | default | 1500 | False | - | - |
+| Ethernet6 | P2P_LINK_TO_SPINE1-DC2_Ethernet6 | routed | - | 172.31.200.21/31 | default | 1500 | False | - | - |
+| Ethernet7 | P2P_LINK_TO_SPINE2-DC2_Ethernet6 | routed | - | 172.31.200.23/31 | default | 1500 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -166,14 +167,14 @@ interface Ethernet6
    no shutdown
    mtu 1500
    no switchport
-   ip address 172.31.200.17/31
+   ip address 172.31.200.21/31
 !
 interface Ethernet7
    description P2P_LINK_TO_SPINE2-DC2_Ethernet6
    no shutdown
    mtu 1500
    no switchport
-   ip address 172.31.200.19/31
+   ip address 172.31.200.23/31
 ```
 
 ### Loopback Interfaces
@@ -184,10 +185,10 @@ interface Ethernet7
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.200.7/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.202.7/32 |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.7/32 |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.7/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.200.8/32 |
+| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.202.8/32 |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | 10.255.10.8/32 |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | 10.255.20.8/32 |
 
 ##### IPv6
 
@@ -195,8 +196,8 @@ interface Ethernet7
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | - |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | - |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | - |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | - |
 
 
 #### Loopback Interfaces Device Configuration
@@ -206,24 +207,24 @@ interface Ethernet7
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.200.7/32
+   ip address 192.168.200.8/32
 !
 interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
-   ip address 192.168.202.7/32
+   ip address 192.168.202.8/32
 !
 interface Loopback10
-   description RED_VTEP_DIAGNOSTICS
+   description VRF_A_VTEP_DIAGNOSTICS
    no shutdown
-   vrf RED
-   ip address 10.255.10.7/32
+   vrf VRF_A
+   ip address 10.255.10.8/32
 !
 interface Loopback20
-   description BLUE_VTEP_DIAGNOSTICS
+   description VRF_B_VTEP_DIAGNOSTICS
    no shutdown
-   vrf BLUE
-   ip address 10.255.20.7/32
+   vrf VRF_B
+   ip address 10.255.20.8/32
 ```
 
 ### VXLAN Interface
@@ -239,8 +240,8 @@ interface Loopback20
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| BLUE | 20 | - |
-| RED | 10 | - |
+| VRF_A | 19 | - |
+| VRF_B | 20 | - |
 
 #### VXLAN Interface Device Configuration
 
@@ -250,8 +251,8 @@ interface Vxlan1
    description BL1-DC2_VTEP
    vxlan source-interface Loopback1
    vxlan udp-port 4789
-   vxlan vrf BLUE vni 20
-   vxlan vrf RED vni 10
+   vxlan vrf VRF_A vni 19
+   vxlan vrf VRF_B vni 20
 ```
 
 ## Routing
@@ -285,16 +286,18 @@ ip virtual-router mac-address 00:00:00:00:00:01
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
-| BLUE | True |
-| RED | True |
+| MGMT | True |
+| VRF_A | True |
+| VRF_B | True |
 
 #### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
-ip routing vrf BLUE
-ip routing vrf RED
+ip routing vrf MGMT
+ip routing vrf VRF_A
+ip routing vrf VRF_B
 ```
 
 ### IPv6 Routing
@@ -304,9 +307,9 @@ ip routing vrf RED
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | False |
-| BLUE | false |
-| default | false |
-| RED | false |
+| MGMT | false |
+| VRF_A | false |
+| VRF_B | false |
 
 ### Static Routes
 
@@ -314,13 +317,13 @@ ip routing vrf RED
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| default | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
+| MGMT | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
 
 ```eos
 !
-ip route 0.0.0.0/0 192.168.0.1
+ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 ```
 
 ### Router BGP
@@ -329,7 +332,7 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65203|  192.168.200.7 |
+| 65300|  192.168.200.8 |
 
 | BGP Tuning |
 | ---------- |
@@ -375,9 +378,9 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
-| 172.31.200.16 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 172.31.200.18 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 192.168.100.7 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
+| 172.31.200.20 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 172.31.200.22 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 192.168.100.7 | 65300 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 | 192.168.200.1 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.2 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 
@@ -402,15 +405,15 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| BLUE | 192.168.200.7:20 | connected |
-| RED | 192.168.200.7:10 | connected |
+| VRF_A | 192.168.200.8:19 | connected |
+| VRF_B | 192.168.200.8:20 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
-router bgp 65203
-   router-id 192.168.200.7
+router bgp 65300
+   router-id 192.168.200.8
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -431,14 +434,14 @@ router bgp 65203
    neighbor IPv4-UNDERLAY-PEERS peer group
    neighbor IPv4-UNDERLAY-PEERS send-community
    neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
-   neighbor 172.31.200.16 peer group IPv4-UNDERLAY-PEERS
-   neighbor 172.31.200.16 remote-as 65200
-   neighbor 172.31.200.16 description spine1-DC2_Ethernet6
-   neighbor 172.31.200.18 peer group IPv4-UNDERLAY-PEERS
-   neighbor 172.31.200.18 remote-as 65200
-   neighbor 172.31.200.18 description spine2-DC2_Ethernet6
+   neighbor 172.31.200.20 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.200.20 remote-as 65200
+   neighbor 172.31.200.20 description spine1-DC2_Ethernet6
+   neighbor 172.31.200.22 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.200.22 remote-as 65200
+   neighbor 172.31.200.22 description spine2-DC2_Ethernet6
    neighbor 192.168.100.7 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.100.7 remote-as 65103
+   neighbor 192.168.100.7 remote-as 65300
    neighbor 192.168.100.7 description BL1-DC1
    neighbor 192.168.200.1 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.1 remote-as 65200
@@ -463,18 +466,18 @@ router bgp 65203
       no neighbor EVPN-OVERLAY-PEERS activate
       neighbor IPv4-UNDERLAY-PEERS activate
    !
-   vrf BLUE
-      rd 192.168.200.7:20
-      route-target import evpn 20:20
-      route-target export evpn 20:20
-      router-id 192.168.200.7
+   vrf VRF_A
+      rd 192.168.200.8:19
+      route-target import evpn 19:19
+      route-target export evpn 19:19
+      router-id 192.168.200.8
       redistribute connected
    !
-   vrf RED
-      rd 192.168.200.7:10
-      route-target import evpn 10:10
-      route-target export evpn 10:10
-      router-id 192.168.200.7
+   vrf VRF_B
+      rd 192.168.200.8:20
+      route-target import evpn 20:20
+      route-target export evpn 20:20
+      router-id 192.168.200.8
       redistribute connected
 ```
 
@@ -557,16 +560,19 @@ route-map RM-CONN-2-BGP permit 10
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
-| BLUE | enabled |
-| RED | enabled |
+| MGMT | enabled |
+| VRF_A | enabled |
+| VRF_B | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
 !
-vrf instance BLUE
+vrf instance MGMT
 !
-vrf instance RED
+vrf instance VRF_A
+!
+vrf instance VRF_B
 ```
 
 ## Virtual Source NAT
@@ -575,13 +581,13 @@ vrf instance RED
 
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
-| BLUE | 10.255.20.7 |
-| RED | 10.255.10.7 |
+| VRF_A | 10.255.10.8 |
+| VRF_B | 10.255.20.8 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
-ip address virtual source-nat vrf BLUE address 10.255.20.7
-ip address virtual source-nat vrf RED address 10.255.10.7
+ip address virtual source-nat vrf VRF_A address 10.255.10.8
+ip address virtual source-nat vrf VRF_B address 10.255.20.8
 ```

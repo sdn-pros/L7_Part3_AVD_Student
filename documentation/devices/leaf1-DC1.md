@@ -55,13 +55,13 @@
 
 | Management Interface | description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
-| Management0 | oob_management | oob | default | 192.168.0.21/24 | 192.168.0.1 |
+| Management0 | oob_management | oob | MGMT | 192.168.0.21/24 | 192.168.0.1 |
 
 ##### IPv6
 
 | Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
 | -------------------- | ----------- | ---- | --- | ------------ | ------------ |
-| Management0 | oob_management | oob | default | - | - |
+| Management0 | oob_management | oob | MGMT | - | - |
 
 #### Management Interfaces Device Configuration
 
@@ -70,6 +70,7 @@
 interface Management0
    description oob_management
    no shutdown
+   vrf MGMT
    ip address 192.168.0.21/24
 ```
 
@@ -96,7 +97,7 @@ dns domain atd.lab
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
-| default | - | - |
+| MGMT | - | - |
 
 #### Management API HTTP Configuration
 
@@ -106,7 +107,7 @@ management api http-commands
    protocol https
    no shutdown
    !
-   vrf default
+   vrf MGMT
       no shutdown
 ```
 
@@ -179,8 +180,8 @@ vlan internal order ascending range 1006 1199
 
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
-| 110 | VRF_RED_VLAN_110 | - |
-| 111 | VRF_BLUE_VLAN_111 | - |
+| 110 | VRF_A_VLAN_110 | - |
+| 111 | VRF_B_VLAN_111 | - |
 | 4093 | LEAF_PEER_L3 | LEAF_PEER_L3 |
 | 4094 | MLAG_PEER | MLAG |
 
@@ -189,10 +190,10 @@ vlan internal order ascending range 1006 1199
 ```eos
 !
 vlan 110
-   name VRF_RED_VLAN_110
+   name VRF_A_VLAN_110
 !
 vlan 111
-   name VRF_BLUE_VLAN_111
+   name VRF_B_VLAN_111
 !
 vlan 4093
    name LEAF_PEER_L3
@@ -287,8 +288,8 @@ interface Port-Channel1
 | --------- | ----------- | --- | ---------- |
 | Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.3/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.102.3/32 |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.3/32 |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.3/32 |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | 10.255.10.3/32 |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | 10.255.20.3/32 |
 
 ##### IPv6
 
@@ -296,8 +297,8 @@ interface Port-Channel1
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | - |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | - |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | - |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | - |
 
 
 #### Loopback Interfaces Device Configuration
@@ -315,15 +316,15 @@ interface Loopback1
    ip address 192.168.102.3/32
 !
 interface Loopback10
-   description RED_VTEP_DIAGNOSTICS
+   description VRF_A_VTEP_DIAGNOSTICS
    no shutdown
-   vrf RED
+   vrf VRF_A
    ip address 10.255.10.3/32
 !
 interface Loopback20
-   description BLUE_VTEP_DIAGNOSTICS
+   description VRF_B_VTEP_DIAGNOSTICS
    no shutdown
-   vrf BLUE
+   vrf VRF_B
    ip address 10.255.20.3/32
 ```
 
@@ -333,8 +334,8 @@ interface Loopback20
 
 | Interface | Description | VRF |  MTU | Shutdown |
 | --------- | ----------- | --- | ---- | -------- |
-| Vlan110 | VRF_RED_VLAN_110 | RED | - | False |
-| Vlan111 | VRF_BLUE_VLAN_111 | BLUE | - | False |
+| Vlan110 | VRF_A_VLAN_110 | VRF_A | - | False |
+| Vlan111 | VRF_B_VLAN_111 | VRF_B | - | False |
 | Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
 | Vlan4094 | MLAG_PEER | default | 1500 | False |
 
@@ -342,8 +343,8 @@ interface Loopback20
 
 | Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
-| Vlan110 |  RED  |  -  |  10.1.10.1/24  |  -  |  -  |  -  |  -  |
-| Vlan111 |  BLUE  |  -  |  10.1.11.1/24  |  -  |  -  |  -  |  -  |
+| Vlan110 |  VRF_A  |  -  |  10.1.10.1/24  |  -  |  -  |  -  |  -  |
+| Vlan111 |  VRF_B  |  -  |  10.1.11.1/24  |  -  |  -  |  -  |  -  |
 | Vlan4093 |  default  |  10.255.250.0/31  |  -  |  -  |  -  |  -  |  -  |
 | Vlan4094 |  default  |  10.255.249.0/31  |  -  |  -  |  -  |  -  |  -  |
 
@@ -352,15 +353,15 @@ interface Loopback20
 ```eos
 !
 interface Vlan110
-   description VRF_RED_VLAN_110
+   description VRF_A_VLAN_110
    no shutdown
-   vrf RED
+   vrf VRF_A
    ip address virtual 10.1.10.1/24
 !
 interface Vlan111
-   description VRF_BLUE_VLAN_111
+   description VRF_B_VLAN_111
    no shutdown
-   vrf BLUE
+   vrf VRF_B
    ip address virtual 10.1.11.1/24
 !
 interface Vlan4093
@@ -391,15 +392,15 @@ interface Vlan4094
 
 | VLAN | VNI | Flood List | Multicast Group |
 | ---- | --- | ---------- | --------------- |
-| 110 | 10110 | - | - |
-| 111 | 10111 | - | - |
+| 110 | 10129 | - | - |
+| 111 | 10130 | - | - |
 
 ##### VRF to VNI and Multicast Group Mappings
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| BLUE | 20 | - |
-| RED | 10 | - |
+| VRF_A | 19 | - |
+| VRF_B | 20 | - |
 
 #### VXLAN Interface Device Configuration
 
@@ -410,10 +411,10 @@ interface Vxlan1
    vxlan source-interface Loopback1
    vxlan virtual-router encapsulation mac-address mlag-system-id
    vxlan udp-port 4789
-   vxlan vlan 110 vni 10110
-   vxlan vlan 111 vni 10111
-   vxlan vrf BLUE vni 20
-   vxlan vrf RED vni 10
+   vxlan vlan 110 vni 10129
+   vxlan vlan 111 vni 10130
+   vxlan vrf VRF_A vni 19
+   vxlan vrf VRF_B vni 20
 ```
 
 ## Routing
@@ -447,16 +448,18 @@ ip virtual-router mac-address 00:00:00:00:00:01
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
-| BLUE | True |
-| RED | True |
+| MGMT | True |
+| VRF_A | True |
+| VRF_B | True |
 
 #### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
-ip routing vrf BLUE
-ip routing vrf RED
+ip routing vrf MGMT
+ip routing vrf VRF_A
+ip routing vrf VRF_B
 ```
 
 ### IPv6 Routing
@@ -466,9 +469,9 @@ ip routing vrf RED
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | False |
-| BLUE | false |
-| default | false |
-| RED | false |
+| MGMT | false |
+| VRF_A | false |
+| VRF_B | false |
 
 ### Static Routes
 
@@ -476,13 +479,13 @@ ip routing vrf RED
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| default | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
+| MGMT | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
 
 ```eos
 !
-ip route 0.0.0.0/0 192.168.0.1
+ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 ```
 
 ### Router BGP
@@ -554,15 +557,15 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
-| 110 | 192.168.100.3:10110 | 10110:10110 | - | - | learned |
-| 111 | 192.168.100.3:10111 | 10111:10111 | - | - | learned |
+| 110 | 192.168.100.3:10129 | 10129:10129 | - | - | learned |
+| 111 | 192.168.100.3:10130 | 10130:10130 | - | - | learned |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| BLUE | 192.168.100.3:20 | connected |
-| RED | 192.168.100.3:10 | connected |
+| VRF_A | 192.168.100.3:19 | connected |
+| VRF_B | 192.168.100.3:20 | connected |
 
 #### Router BGP Device Configuration
 
@@ -608,13 +611,13 @@ router bgp 65101
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan 110
-      rd 192.168.100.3:10110
-      route-target both 10110:10110
+      rd 192.168.100.3:10129
+      route-target both 10129:10129
       redistribute learned
    !
    vlan 111
-      rd 192.168.100.3:10111
-      route-target both 10111:10111
+      rd 192.168.100.3:10130
+      route-target both 10130:10130
       redistribute learned
    !
    address-family evpn
@@ -628,17 +631,17 @@ router bgp 65101
       neighbor IPv4-UNDERLAY-PEERS activate
       neighbor MLAG-IPv4-UNDERLAY-PEER activate
    !
-   vrf BLUE
-      rd 192.168.100.3:20
-      route-target import evpn 20:20
-      route-target export evpn 20:20
+   vrf VRF_A
+      rd 192.168.100.3:19
+      route-target import evpn 19:19
+      route-target export evpn 19:19
       router-id 192.168.100.3
       redistribute connected
    !
-   vrf RED
-      rd 192.168.100.3:10
-      route-target import evpn 10:10
-      route-target export evpn 10:10
+   vrf VRF_B
+      rd 192.168.100.3:20
+      route-target import evpn 20:20
+      route-target export evpn 20:20
       router-id 192.168.100.3
       redistribute connected
 ```
@@ -732,16 +735,19 @@ route-map RM-MLAG-PEER-IN permit 10
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
-| BLUE | enabled |
-| RED | enabled |
+| MGMT | enabled |
+| VRF_A | enabled |
+| VRF_B | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
 !
-vrf instance BLUE
+vrf instance MGMT
 !
-vrf instance RED
+vrf instance VRF_A
+!
+vrf instance VRF_B
 ```
 
 ## Virtual Source NAT
@@ -750,13 +756,13 @@ vrf instance RED
 
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
-| BLUE | 10.255.20.3 |
-| RED | 10.255.10.3 |
+| VRF_A | 10.255.10.3 |
+| VRF_B | 10.255.20.3 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
-ip address virtual source-nat vrf BLUE address 10.255.20.3
-ip address virtual source-nat vrf RED address 10.255.10.3
+ip address virtual source-nat vrf VRF_A address 10.255.10.3
+ip address virtual source-nat vrf VRF_B address 10.255.20.3
 ```

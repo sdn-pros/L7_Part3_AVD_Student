@@ -47,13 +47,13 @@
 
 | Management Interface | description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
-| Management0 | oob_management | oob | default | 192.168.0.91/24 | 192.168.0.1 |
+| Management0 | oob_management | oob | MGMT | 192.168.0.91/24 | 192.168.0.1 |
 
 ##### IPv6
 
 | Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
 | -------------------- | ----------- | ---- | --- | ------------ | ------------ |
-| Management0 | oob_management | oob | default | - | - |
+| Management0 | oob_management | oob | MGMT | - | - |
 
 #### Management Interfaces Device Configuration
 
@@ -62,6 +62,7 @@
 interface Management0
    description oob_management
    no shutdown
+   vrf MGMT
    ip address 192.168.0.91/24
 ```
 
@@ -88,7 +89,7 @@ dns domain atd.lab
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
-| default | - | - |
+| MGMT | - | - |
 
 #### Management API HTTP Configuration
 
@@ -98,7 +99,7 @@ management api http-commands
    protocol https
    no shutdown
    !
-   vrf default
+   vrf MGMT
       no shutdown
 ```
 
@@ -186,8 +187,8 @@ interface Ethernet7
 | --------- | ----------- | --- | ---------- |
 | Loopback0 | EVPN_Overlay_Peering | default | 192.168.100.7/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.102.7/32 |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | 10.255.10.7/32 |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | 10.255.20.7/32 |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | 10.255.10.7/32 |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | 10.255.20.7/32 |
 
 ##### IPv6
 
@@ -195,8 +196,8 @@ interface Ethernet7
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-| Loopback10 | RED_VTEP_DIAGNOSTICS | RED | - |
-| Loopback20 | BLUE_VTEP_DIAGNOSTICS | BLUE | - |
+| Loopback10 | VRF_A_VTEP_DIAGNOSTICS | VRF_A | - |
+| Loopback20 | VRF_B_VTEP_DIAGNOSTICS | VRF_B | - |
 
 
 #### Loopback Interfaces Device Configuration
@@ -214,15 +215,15 @@ interface Loopback1
    ip address 192.168.102.7/32
 !
 interface Loopback10
-   description RED_VTEP_DIAGNOSTICS
+   description VRF_A_VTEP_DIAGNOSTICS
    no shutdown
-   vrf RED
+   vrf VRF_A
    ip address 10.255.10.7/32
 !
 interface Loopback20
-   description BLUE_VTEP_DIAGNOSTICS
+   description VRF_B_VTEP_DIAGNOSTICS
    no shutdown
-   vrf BLUE
+   vrf VRF_B
    ip address 10.255.20.7/32
 ```
 
@@ -239,8 +240,8 @@ interface Loopback20
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| BLUE | 20 | - |
-| RED | 10 | - |
+| VRF_A | 19 | - |
+| VRF_B | 20 | - |
 
 #### VXLAN Interface Device Configuration
 
@@ -250,8 +251,8 @@ interface Vxlan1
    description BL1-DC1_VTEP
    vxlan source-interface Loopback1
    vxlan udp-port 4789
-   vxlan vrf BLUE vni 20
-   vxlan vrf RED vni 10
+   vxlan vrf VRF_A vni 19
+   vxlan vrf VRF_B vni 20
 ```
 
 ## Routing
@@ -285,16 +286,18 @@ ip virtual-router mac-address 00:00:00:00:00:01
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
-| BLUE | True |
-| RED | True |
+| MGMT | True |
+| VRF_A | True |
+| VRF_B | True |
 
 #### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
-ip routing vrf BLUE
-ip routing vrf RED
+ip routing vrf MGMT
+ip routing vrf VRF_A
+ip routing vrf VRF_B
 ```
 
 ### IPv6 Routing
@@ -304,9 +307,9 @@ ip routing vrf RED
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | False |
-| BLUE | false |
-| default | false |
-| RED | false |
+| MGMT | false |
+| VRF_A | false |
+| VRF_B | false |
 
 ### Static Routes
 
@@ -314,13 +317,13 @@ ip routing vrf RED
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| default | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
+| MGMT | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
 
 ```eos
 !
-ip route 0.0.0.0/0 192.168.0.1
+ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 ```
 
 ### Router BGP
@@ -329,7 +332,7 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65103|  192.168.100.7 |
+| 65300|  192.168.100.7 |
 
 | BGP Tuning |
 | ---------- |
@@ -379,7 +382,7 @@ ip route 0.0.0.0/0 192.168.0.1
 | 172.31.100.18 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.100.1 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.100.2 | 65100 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 192.168.200.7 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
+| 192.168.200.8 | 65300 | default | - | Inherited from peer group EVPN-OVERLAY-CORE | Inherited from peer group EVPN-OVERLAY-CORE | - | Inherited from peer group EVPN-OVERLAY-CORE | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -402,14 +405,14 @@ ip route 0.0.0.0/0 192.168.0.1
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| BLUE | 192.168.100.7:20 | connected |
-| RED | 192.168.100.7:10 | connected |
+| VRF_A | 192.168.100.7:19 | connected |
+| VRF_B | 192.168.100.7:20 | connected |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
-router bgp 65103
+router bgp 65300
    router-id 192.168.100.7
    distance bgp 20 200 200
    maximum-paths 4 ecmp 4
@@ -443,9 +446,9 @@ router bgp 65103
    neighbor 192.168.100.2 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.100.2 remote-as 65100
    neighbor 192.168.100.2 description spine2-DC1
-   neighbor 192.168.200.7 peer group EVPN-OVERLAY-CORE
-   neighbor 192.168.200.7 remote-as 65203
-   neighbor 192.168.200.7 description BL1-DC2
+   neighbor 192.168.200.8 peer group EVPN-OVERLAY-CORE
+   neighbor 192.168.200.8 remote-as 65300
+   neighbor 192.168.200.8 description BL1-DC2
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn
@@ -463,17 +466,17 @@ router bgp 65103
       no neighbor EVPN-OVERLAY-PEERS activate
       neighbor IPv4-UNDERLAY-PEERS activate
    !
-   vrf BLUE
-      rd 192.168.100.7:20
-      route-target import evpn 20:20
-      route-target export evpn 20:20
+   vrf VRF_A
+      rd 192.168.100.7:19
+      route-target import evpn 19:19
+      route-target export evpn 19:19
       router-id 192.168.100.7
       redistribute connected
    !
-   vrf RED
-      rd 192.168.100.7:10
-      route-target import evpn 10:10
-      route-target export evpn 10:10
+   vrf VRF_B
+      rd 192.168.100.7:20
+      route-target import evpn 20:20
+      route-target export evpn 20:20
       router-id 192.168.100.7
       redistribute connected
 ```
@@ -557,16 +560,19 @@ route-map RM-CONN-2-BGP permit 10
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
-| BLUE | enabled |
-| RED | enabled |
+| MGMT | enabled |
+| VRF_A | enabled |
+| VRF_B | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
 !
-vrf instance BLUE
+vrf instance MGMT
 !
-vrf instance RED
+vrf instance VRF_A
+!
+vrf instance VRF_B
 ```
 
 ## Virtual Source NAT
@@ -575,13 +581,13 @@ vrf instance RED
 
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
-| BLUE | 10.255.20.7 |
-| RED | 10.255.10.7 |
+| VRF_A | 10.255.10.7 |
+| VRF_B | 10.255.20.7 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
-ip address virtual source-nat vrf BLUE address 10.255.20.7
-ip address virtual source-nat vrf RED address 10.255.10.7
+ip address virtual source-nat vrf VRF_A address 10.255.10.7
+ip address virtual source-nat vrf VRF_B address 10.255.20.7
 ```

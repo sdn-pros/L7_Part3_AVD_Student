@@ -40,13 +40,13 @@
 
 | Management Interface | description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
-| Management0 | oob_management | oob | default | 192.168.0.14/24 | 192.168.0.1 |
+| Management0 | oob_management | oob | MGMT | 192.168.0.14/24 | 192.168.0.1 |
 
 ##### IPv6
 
 | Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
 | -------------------- | ----------- | ---- | --- | ------------ | ------------ |
-| Management0 | oob_management | oob | default | - | - |
+| Management0 | oob_management | oob | MGMT | - | - |
 
 #### Management Interfaces Device Configuration
 
@@ -55,6 +55,7 @@
 interface Management0
    description oob_management
    no shutdown
+   vrf MGMT
    ip address 192.168.0.14/24
 ```
 
@@ -81,7 +82,7 @@ dns domain atd.lab
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
-| default | - | - |
+| MGMT | - | - |
 
 #### Management API HTTP Configuration
 
@@ -91,7 +92,7 @@ management api http-commands
    protocol https
    no shutdown
    !
-   vrf default
+   vrf MGMT
       no shutdown
 ```
 
@@ -144,7 +145,7 @@ vlan internal order ascending range 1006 1199
 | Ethernet3 | P2P_LINK_TO_LEAF2-DC2_Ethernet3 | routed | - | 172.31.200.4/31 | default | 1500 | False | - | - |
 | Ethernet4 | P2P_LINK_TO_LEAF3-DC2_Ethernet3 | routed | - | 172.31.200.8/31 | default | 1500 | False | - | - |
 | Ethernet5 | P2P_LINK_TO_LEAF4-DC2_Ethernet3 | routed | - | 172.31.200.12/31 | default | 1500 | False | - | - |
-| Ethernet6 | P2P_LINK_TO_BL1-DC2_Ethernet6 | routed | - | 172.31.200.16/31 | default | 1500 | False | - | - |
+| Ethernet6 | P2P_LINK_TO_BL1-DC2_Ethernet6 | routed | - | 172.31.200.20/31 | default | 1500 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -183,7 +184,7 @@ interface Ethernet6
    no shutdown
    mtu 1500
    no switchport
-   ip address 172.31.200.16/31
+   ip address 172.31.200.20/31
 ```
 
 ### Loopback Interfaces
@@ -231,12 +232,14 @@ service routing protocols model multi-agent
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
+| MGMT | True |
 
 #### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
+ip routing vrf MGMT
 ```
 
 ### IPv6 Routing
@@ -246,7 +249,7 @@ ip routing
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | False |
-| default | false |
+| MGMT | false |
 
 ### Static Routes
 
@@ -254,13 +257,13 @@ ip routing
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| default | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
+| MGMT | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
 
 ```eos
 !
-ip route 0.0.0.0/0 192.168.0.1
+ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 ```
 
 ### Router BGP
@@ -309,12 +312,12 @@ ip route 0.0.0.0/0 192.168.0.1
 | 172.31.200.5 | 65201 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 172.31.200.9 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 172.31.200.13 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 172.31.200.17 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 172.31.200.21 | 65300 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 192.168.200.3 | 65201 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.4 | 65201 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.5 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 192.168.200.6 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 192.168.200.7 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 192.168.200.8 | 65300 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -357,9 +360,9 @@ router bgp 65200
    neighbor 172.31.200.13 peer group IPv4-UNDERLAY-PEERS
    neighbor 172.31.200.13 remote-as 65202
    neighbor 172.31.200.13 description leaf4-DC2_Ethernet3
-   neighbor 172.31.200.17 peer group IPv4-UNDERLAY-PEERS
-   neighbor 172.31.200.17 remote-as 65203
-   neighbor 172.31.200.17 description BL1-DC2_Ethernet6
+   neighbor 172.31.200.21 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.200.21 remote-as 65300
+   neighbor 172.31.200.21 description BL1-DC2_Ethernet6
    neighbor 192.168.200.3 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.3 remote-as 65201
    neighbor 192.168.200.3 description leaf1-DC2
@@ -372,9 +375,9 @@ router bgp 65200
    neighbor 192.168.200.6 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.200.6 remote-as 65202
    neighbor 192.168.200.6 description leaf4-DC2
-   neighbor 192.168.200.7 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.200.7 remote-as 65203
-   neighbor 192.168.200.7 description BL1-DC2
+   neighbor 192.168.200.8 peer group EVPN-OVERLAY-PEERS
+   neighbor 192.168.200.8 remote-as 65300
+   neighbor 192.168.200.8 description BL1-DC2
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn
@@ -451,8 +454,11 @@ route-map RM-CONN-2-BGP permit 10
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
+| MGMT | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
+!
+vrf instance MGMT
 ```
