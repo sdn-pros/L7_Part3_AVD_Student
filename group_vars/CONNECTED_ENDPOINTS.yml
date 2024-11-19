@@ -27,5 +27,21 @@ servers:
           mode: active
 
   - name: host1-DC2
+    adapters:
+      - endpoint_ports: [ E1, E2 ]
+        switch_ports: [ Ethernet6, Ethernet6 ]
+        switches: [leaf1-DC2, leaf2-DC2 ]
+        profile: VM_Servers
+        port_channel:
+          channel_id: 10
+          mode: active
   
   - name: host2-DC2
+    adapters:
+      - endpoint_ports: [ E1, E2 ]
+        switch_ports: [ Ethernet6, Ethernet6 ]
+        switches: [leaf3-DC2, leaf4-DC2 ]
+        profile: VM_Servers
+        port_channel:
+          channel_id: 10
+          mode: active

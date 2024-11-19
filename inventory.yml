@@ -55,6 +55,8 @@ all:
                   ansible_host: 192.168.0.14
                 spine2-DC2:
                   ansible_host: 192.168.0.15
+                spine3-DC2:
+                  ansible_host: 192.168.0.16
             DC2_LEAVES:
               children:
                 DC2_LEAF1:
