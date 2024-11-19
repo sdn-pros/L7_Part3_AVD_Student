@@ -1,0 +1,135 @@
+underlay_routing_protocol: isis-sr
+overlay_routing_protocol: ibgp
+
+bgp_as: 1
+
+bgp_distance:
+  external_routes: 20
+  internal_routes: 200
+  local_routes: 200
+
+p:
+  # Definition of default values that will be configured to all nodes defined in this group
+  defaults:
+    # Set the relevant platform as each platform has different default values in Ansible AVD
+    platform: cEOS
+    # Pool of IPv4 addresses to configure interface Loopback0 used for Router ID
+    loopback_ipv4_pool: 192.168.255.0/24
+    # ISIS NET system id prefix
+    isis_system_id_prefix: '0000.0000'
+  # Definition of nodes contained in this group.
+  # Specific configuration of device must take place under the node definition. Each node inherites all values defined under 'defaults'
+  nodes:
+    # Name of the node to be defined (must be consistent with definition in inventory)
+    - name: P
+      # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
+      id: 93
+      # Management IP to be assigned to the management interface
+      mgmt_ip: 192.168.0.93/24
+    - name: P2
+      id: 94
+      mgmt_ip: 192.168.0.94/24
+    - name: P3
+      id: 97
+      mgmt_ip: 192.168.0.97/24
+    - name: P4
+      id: 98
+      mgmt_ip: 192.168.0.98/24
+pe:
+  defaults:
+    # Set the relevant platform as each platform has different default values in Ansible AVD
+    platform: vEOS-lab
+    # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
+    loopback_ipv4_pool: 192.168.255.0/24
+    virtual_router_mac_address: 00:1c:73:00:00:99
+    mpls_route_reflectors: [ RR ]
+    # ISIS NET system id prefix
+    isis_system_id_prefix: '0000.0001'
+    spanning_tree_mode: none
+
+  # If two nodes (and only two) are in the same node_group, they will automatically form an MLAG pair
+  node_groups:
+    # Definition of a node group that will include two devices in MLAG.
+    # Definitions under the group will be inherited by both nodes in the group
+    - group: BL1-DC1
+      nodes:
+        # Definition of hostnames under the node_group
+        - name: BL1-DC1
+          id: 91
+          mgmt_ip: 192.168.0.91/24
+    - group: BL1-DC2
+      nodes:
+        - name:
+          id: 95
+          mgmt_ip: 192.168.0.95/24
+rr:
+  defaults:
+    platform: vEOS-lab
+    spanning_tree_mode: none
+    loopback_ipv4_pool: 192.168.255.0/24
+    mpls_route_reflectors: [ RR1 ]
+    # ISIS NET system id prefix
+    isis_system_id_prefix: '0000.0002'
+  node_groups:
+    - group: WAN1_RR1-2
+      nodes:
+        - name: RR1
+          id: 90
+          mgmt_ip: 192.168.0.90/24
+core_interfaces:
+  p2p_links_profiles:
+    - name: local_profile
+      isis_metric: 100
+      isis_circuit_type: level-2
+  p2p_links:
+    - nodes: [P1, P2]
+      id: 1
+      profile: local_profile
+      interfaces: [ Ethernet4, Ethernet4]
+      subnet: 10.1.2.0/30 
+    - nodes: [P1, P3]
+      id: 2
+      profile: local_profile
+      interfaces: [ Ethernet2, Ethernet2]
+      subnet: 10.1.3.0/30 
+    - nodes: [P1, BL1-DC1]
+      id: 3
+      profile: local_profile
+      interfaces: [ Ethernet1, Ethernet1]
+      subnet: 10.1.11.0/30 
+    - nodes: [P2, BL1-DC1]
+      id: 4
+      profile: local_profile
+      interfaces: [ Ethernet3, Ethernet4]
+      subnet: 10.2.11.0/30 
+    - nodes: [P2, P4]
+      id: 5
+      profile: local_profile
+      interfaces: [ Ethernet2, Ethernet2]
+      subnet: 10.2.4.0/30 
+    - nodes: [BL1-DC1, RR]
+      id: 6
+      profile: local_profile
+      interfaces: [ Ethernet5, Ethernet1]
+      subnet: 10.11.90.0/30
+    - nodes: [P3, P4]
+      id: 7
+      profile: local_profile
+      interfaces: [ Ethernet4, Ethernet4]
+      subnet: 10.3.4.0/30
+    - nodes: [P3, BL1-DC2]
+      id: 8
+      profile: local_profile
+      interfaces: [ Ethernet1, Ethernet1]
+      subnet: 10.3.21.0/30
+    - nodes: [P4, BL1-DC2]
+      id: 9
+      profile: local_profile
+      interfaces: [ Ethernet3, Ethernet4]
+      subnet: 10.4.21.0/30
+    - nodes: [BL1-DC2, RR]
+      id: 10
+      profile: local_profile
+      interfaces: [ Ethernet5, Ethernet5]
+      subnet: 10.21.90.0/30 
+        
