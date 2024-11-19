@@ -6,5 +6,156 @@ evpn_overlay_bgp_rtc: true
 spine:
   defaults:
     platform: cEOS
- 
+    loopback_ipv4_pool: 192.168.255.0/24
+    # ASN to be used by BGP
+    bgp_as: 65110
+  nodes:
+    # Name of the node to be defined (must be consistent with definition in inventory)
+    - name: spine1-DC1
+      # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
+      id: 11
+      # Management IP to be assigned to the management interface
+      mgmt_ip: 192.168.0.11/24
+      downlink_pools:
+        - ipv4_pool: 10.10.0.0/27
+          downlink_interfaces:
+            - Ethernet2
+            - Ethernet3
+            - Ethernet4
+            - Ethernet5
+        - ipv4_pool: 10.111.11.0/30
+          downlink_interfaces: 
+            - Ethernet6
+    - name: spine2-DC1
+      id: 12
+      mgmt_ip: 192.168.0.12/24
+      downlink_pools:
+        - ipv4_pool: 10.10.0.32/27
+          downlink_interfaces:
+            - Ethernet2
+            - Ethernet3
+            - Ethernet4
+            - Ethernet5
+        - ipv4_pool: 10.112.11.0/30
+          downlink_interfaces: 
+            - Ethernet6
+    - name: spine3-DC1
+      id: 13
+      mgmt_ip: 192.168.0.13/24
+      downlink_pools:
+        - ipv4_pool: 10.10.0.64/27
+          downlink_interfaces:
+            - Ethernet2
+            - Ethernet3
+            - Ethernet4
+            - Ethernet5
+        - ipv4_pool: 10.113.11.0/30
+          downlink_interfaces: 
+            - Ethernet6
 
+l3leaf:
+  defaults:
+    platform: cEOS
+    loopback_ipv4_pool: 192.168.255.0/24
+    vtep_loopback_ipv4_pool: 10.255.1.0/24
+    uplink_interfaces: ['Ethernet3', 'Ethernet4', 'Ethernet5']
+    uplink_switches: ['spine1-DC1', 'spine2-DC1', 'spine3-DC1']
+    #uplink_ipv4_pool: 10.10.0.0/24
+    mlag_interfaces: ['Ethernet1', 'Ethernet2']
+    mlag_peer_ipv4_pool: 10.255.2.0/24
+    mlag_peer_l3_ipv4_pool: 10.255.3.0/24
+    virtual_router_mac_address: 00:1c:73:00:00:99
+    spanning_tree_priority: 4096
+    spanning_tree_mode: mstp
+  node_groups:
+    - group: DC1_L3_LEAF12
+      bgp_as: 65012
+      nodes:
+        # Definition of hostnames under the node_group
+        - name: leaf1-DC1
+          id: 21
+          mgmt_ip: 192.168.0.21/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet2
+            - Ethernet2
+            - Ethernet2
+        - name: leaf2-DC1
+          id: 22
+          mgmt_ip: 192.168.0.22/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet3
+            - Ethernet3
+            - Ethernet3
+    - group: DC1_L3_LEAF34
+      bgp_as: 65034
+      nodes:
+        # Definition of hostnames under the node_group
+        - name: leaf3-DC1
+          id: 23
+          mgmt_ip: 192.168.0.23/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet4
+            - Ethernet4
+            - Ethernet4
+        - name: leaf4-DC1
+          id: 24
+          mgmt_ip: 192.168.0.24/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet5
+            - Ethernet5
+            - Ethernet5
+    - group: DC1_BL12
+      bgp_as: 65012
+      nodes:
+        # Definition of hostnames under the node_group
+        - name: leaf3-DC1
+          id: 23
+          mgmt_ip: 192.168.0.23/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet4
+            - Ethernet4
+            - Ethernet4
+        - name: leaf4-DC1
+          id: 24
+          mgmt_ip: 192.168.0.24/24
+          # Definition of the port to be used in the uplink device facing this device.
+          # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_switch_interfaces:
+            - Ethernet5
+            - Ethernet5
+            - Ethernet5
+gwleaf:
+  defaults:
+    platform: cEOS
+    loopback_ipv4_pool: 192.168.255.0/24
+    vtep_loopback_ipv4_pool: 10.255.1.0/24
+    uplink_interfaces: ['Ethernet3', 'Ethernet4', 'Ethernet5']
+    uplink_switches: ['spine1-DC1', 'spine2-DC1', 'spine3-DC1']
+    mlag_interfaces: ['Ethernet1', 'Ethernet2']
+    mlag_peer_ipv4_pool: 10.255.2.0/24
+    virtual_router_mac_address: 00:1c:73:00:00:99
+    spanning_tree_priority: 4096
+    spanning_tree_mode: mstp
+    bgp_as: 1
+  nodes:
+    # Name of the node to be defined (must be consistent with definition in inventory)
+    - name: BL1-DC1
+    # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
+      id: 91
+      # Management IP to be assigned to the management interface
+      mgmt_ip: 192.168.0.91/24
+      uplink_interfaces: ['Ethernet6', 'Ethernet7', 'Ethernet8']
+      uplink_switch_interfaces:
+          - Ethernet6
+          - Ethernet6
+          - Ethernet6
