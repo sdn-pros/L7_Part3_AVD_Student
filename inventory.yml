@@ -89,7 +89,7 @@ all:
                   ansible_host: 192.168.0.97
                 P4:
                   ansible_host: 192.168.0.98
-            RR:
+            RRs:
               hosts:
                 RR:
                   ansible_host: 192.168.0.90
@@ -104,3 +104,9 @@ all:
       children:
         DC1_LEAVES:
         DC2_LEAVES:
+    SHIM:
+      children:
+        DC1_SPINES:
+        DC2_SPINES:
+        DC1_BORDER_LEAVES:
+        DC2_BORDER_LEAVES:

@@ -3,6 +3,10 @@ is_deployed: true
 router_bgp:
   as: '1'
   router_id: 192.168.255.91
+  distance:
+    external_routes: 20
+    internal_routes: 200
+    local_routes: 200
   bgp:
     default:
       ipv4_unicast: false
@@ -10,65 +14,58 @@ router_bgp:
     paths: 4
     ecmp: 4
   peer_groups:
-  - name: IPv4-UNDERLAY-PEERS
-    type: ipv4
-    maximum_routes: 12000
-    send_community: all
-  - name: EVPN-OVERLAY-PEERS
-    type: evpn
+  - name: MPLS-OVERLAY-PEERS
+    type: mpls
     update_source: Loopback0
     bfd: true
     send_community: all
     maximum_routes: 0
-    ebgp_multihop: 3
-  address_family_ipv4:
-    peer_groups:
-    - name: IPv4-UNDERLAY-PEERS
-      activate: true
-    - name: EVPN-OVERLAY-PEERS
-      activate: false
-  redistribute_routes:
-  - source_protocol: connected
-    route_map: RM-CONN-2-BGP
-  neighbors:
-  - ip_address: 10.111.11.0
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65110'
-    peer: spine1-DC1
-    description: spine1-DC1_Ethernet6
-  - ip_address: 10.112.11.0
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65110'
-    peer: spine2-DC1
-    description: spine2-DC1_Ethernet6
-  - ip_address: 10.113.11.0
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65110'
-    peer: spine3-DC1
-    description: spine3-DC1_Ethernet6
-  - ip_address: 192.168.255.11
-    peer_group: EVPN-OVERLAY-PEERS
-    peer: spine1-DC1
-    description: spine1-DC1
-    remote_as: '65110'
-  - ip_address: 192.168.255.12
-    peer_group: EVPN-OVERLAY-PEERS
-    peer: spine2-DC1
-    description: spine2-DC1
-    remote_as: '65110'
-  - ip_address: 192.168.255.13
-    peer_group: EVPN-OVERLAY-PEERS
-    peer: spine3-DC1
-    description: spine3-DC1
+    remote_as: '1'
+  - name: VXLAN-OVERLAY-PEERS
+    update_source: Loopback0
+    send_community: all
+    ebgp_multihop: 15
     remote_as: '65110'
   address_family_evpn:
+    neighbor_default:
+      encapsulation: mpls
+      next_hop_self_source_interface: Loopback0
     peer_groups:
-    - name: EVPN-OVERLAY-PEERS
+    - name: MPLS-OVERLAY-PEERS
       activate: true
-  address_family_rtc:
+      route_map_in: RM-EVPN-SOO-IN
+      route_map_out: RM-EVPN-SOO-OUT
+    - name: VXLAN-OVERLAY-PEERS
+      activate: true
+      encapsulation: vxlan
+  address_family_ipv4:
     peer_groups:
-    - name: EVPN-OVERLAY-PEERS
+    - name: MPLS-OVERLAY-PEERS
+      activate: false
+    neighbors:
+    - ip_address: 10.111.11.0
       activate: true
+    - ip_address: 10.112.11.0
+      activate: true
+    - ip_address: 10.113.11.0
+      activate: true
+  neighbors:
+  - ip_address: 192.168.255.95
+    peer_group: MPLS-OVERLAY-PEERS
+    peer: BL1-DC2
+    description: BL1-DC2
+  - ip_address: 10.111.11.0
+    remote_as: '65110'
+  - ip_address: 10.112.11.0
+    remote_as: '65110'
+  - ip_address: 10.113.11.0
+    remote_as: '65110'
+  - ip_address: 192.168.255.11
+    peer_group: VXLAN-OVERLAY-PEERS
+  - ip_address: 192.168.255.12
+    peer_group: VXLAN-OVERLAY-PEERS
+  - ip_address: 192.168.255.13
+    peer_group: VXLAN-OVERLAY-PEERS
   vrfs:
   - name: tenant-a
     router_id: 192.168.255.91
@@ -114,9 +111,6 @@ vlan_internal_order:
     ending: 1199
 spanning_tree:
   mode: mstp
-  mst_instances:
-  - id: '0'
-    priority: 4096
 vrfs:
 - name: MGMT
   ip_routing: true
@@ -137,60 +131,124 @@ management_api_http:
   enable_https: true
 ethernet_interfaces:
 - name: Ethernet6
-  peer: spine1-DC1
-  peer_interface: Ethernet6
-  peer_type: spine
-  description: P2P_LINK_TO_SPINE1-DC1_Ethernet6
-  shutdown: false
-  mtu: 9214
-  type: routed
+  peer_type: l3_interface
   ip_address: 10.111.11.1/31
+  shutdown: false
+  type: routed
 - name: Ethernet7
-  peer: spine2-DC1
-  peer_interface: Ethernet6
-  peer_type: spine
-  description: P2P_LINK_TO_SPINE2-DC1_Ethernet6
-  shutdown: false
-  mtu: 9214
-  type: routed
+  peer_type: l3_interface
   ip_address: 10.112.11.1/31
+  shutdown: false
+  type: routed
 - name: Ethernet8
-  peer: spine3-DC1
-  peer_interface: Ethernet6
-  peer_type: spine
-  description: P2P_LINK_TO_SPINE3-DC1_Ethernet6
+  peer_type: l3_interface
+  ip_address: 10.113.11.1/31
+  shutdown: false
+  type: routed
+- name: Ethernet1
+  peer: P1
+  peer_interface: Ethernet1
+  peer_type: p
+  description: P2P_LINK_TO_P1_Ethernet1
+  type: routed
   shutdown: false
   mtu: 9214
+  ip_address: 10.1.11.2/30
+  isis_enable: bb
+  isis_metric: 100
+  isis_network_point_to_point: true
+  isis_hello_padding: true
+  isis_circuit_type: level-2
+  mpls:
+    ip: true
+- name: Ethernet4
+  peer: P2
+  peer_interface: Ethernet3
+  peer_type: p
+  description: P2P_LINK_TO_P2_Ethernet3
   type: routed
-  ip_address: 10.113.11.1/31
+  shutdown: false
+  mtu: 9214
+  ip_address: 10.2.11.2/30
+  isis_enable: bb
+  isis_metric: 100
+  isis_network_point_to_point: true
+  isis_hello_padding: true
+  isis_circuit_type: level-2
+  mpls:
+    ip: true
+- name: Ethernet5
+  peer: RR
+  peer_interface: Ethernet1
+  peer_type: rr
+  description: P2P_LINK_TO_RR_Ethernet1
+  type: routed
+  shutdown: false
+  mtu: 9214
+  ip_address: 10.11.90.1/30
+  isis_enable: bb
+  isis_metric: 100
+  isis_network_point_to_point: true
+  isis_hello_padding: true
+  isis_circuit_type: level-2
+  mpls:
+    ip: true
 loopback_interfaces:
 - name: Loopback0
-  description: EVPN_Overlay_Peering
+  description: MPLS_Overlay_peering
   shutdown: false
   ip_address: 192.168.255.91/32
+  isis_enable: bb
+  isis_passive: true
+  node_segment:
+    ipv4_index: 91
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
   ip_address: 10.255.1.91/32
-prefix_lists:
-- name: PL-LOOPBACKS-EVPN-OVERLAY
-  sequence_numbers:
-  - sequence: 10
-    action: permit 192.168.255.0/24 eq 32
-  - sequence: 20
-    action: permit 10.255.1.0/24 eq 32
-route_maps:
-- name: RM-CONN-2-BGP
-  sequence_numbers:
-  - sequence: 10
-    type: permit
-    match:
-    - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+  isis_enable: bb
+  isis_passive: true
+router_isis:
+  instance: bb
+  log_adjacency_changes: true
+  net: 49.0001.0000.0001.0091.00
+  router_id: 192.168.255.91
+  is_type: level-2
+  address_family_ipv4:
+    enabled: true
+    maximum_paths: 4
+  advertise:
+    passive_only: false
+  segment_routing_mpls:
+    router_id: 192.168.255.91
+    enabled: true
+mpls:
+  ip: true
+ip_extcommunity_lists:
+- name: ECL-EVPN-SOO
+  entries:
+  - type: permit
+    extcommunities: soo 10.255.1.91:1
 router_bfd:
   multihop:
     interval: 300
     min_rx: 300
     multiplier: 3
+route_maps:
+- name: RM-EVPN-SOO-IN
+  sequence_numbers:
+  - sequence: 10
+    type: deny
+    match:
+    - extcommunity ECL-EVPN-SOO
+  - sequence: 20
+    type: permit
+- name: RM-EVPN-SOO-OUT
+  sequence_numbers:
+  - sequence: 10
+    type: permit
+    set:
+    - extcommunity soo 10.255.1.91:1 additive
 vlans:
 - id: 16
   name: VLAN16
@@ -219,7 +277,7 @@ vxlan_interface:
     description: BL1-DC1_VTEP
     vxlan:
       udp_port: 4789
-      source_interface: Loopback1
+      source_interface: loopback0
       vlans:
       - id: 16
         vni: 10016
@@ -229,4 +287,4 @@ vxlan_interface:
       - name: tenant-a
         vni: 1000
 metadata:
-  platform: cEOS
+  platform: vEOS-lab

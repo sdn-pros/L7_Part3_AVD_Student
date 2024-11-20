@@ -1,0 +1,42 @@
+custom_structured_configuration_vxlan_interface:
+  Vxlan1:
+    vxlan:
+      source_interface: loopback0
+      vrfs:
+        - name: tenant-a
+          vni: 1000
+custom_structured_configuration_router_bgp:
+  peer_groups:
+    - name: VXLAN-OVERLAY-PEERS
+      update_source: Loopback0
+      send_community: all
+      ebgp_multihop: 15
+      remote_as: 65110
+  neighbors:
+    - ip_address: '10.111.11.0'
+      remote_as: 65110
+    - ip_address: '10.112.11.0'
+      remote_as: 65110
+    - ip_address: '10.113.11.0'
+      remote_as: 65110
+    - ip_address: '192.168.255.11'
+      peer_group: VXLAN-OVERLAY-PEERS
+    - ip_address: '192.168.255.12'
+      peer_group: VXLAN-OVERLAY-PEERS
+    - ip_address: '192.168.255.13'
+      peer_group: VXLAN-OVERLAY-PEERS
+  address_family_ipv4:
+    neighbors:
+      - ip_address: '10.111.11.0'
+        activate: true
+      - ip_address: '10.112.11.0'
+        activate: true
+      - ip_address: '10.113.11.0'
+        activate: true
+  address_family_evpn:
+    peer_groups:
+      - name: VXLAN-OVERLAY-PEERS
+        activate: true
+        encapsulation: vxlan
+        
+      

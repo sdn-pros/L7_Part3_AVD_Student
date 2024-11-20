@@ -40,6 +40,26 @@ cvp_devices:
     parentContainerName: DC2_LEAF2
     configlets:
       - AVD_leaf4-DC2
+  - fqdn: P1
+    parentContainerName: Ps
+    configlets:
+      - AVD_P1
+  - fqdn: P2
+    parentContainerName: Ps
+    configlets:
+      - AVD_P2
+  - fqdn: P3
+    parentContainerName: Ps
+    configlets:
+      - AVD_P3
+  - fqdn: P4
+    parentContainerName: Ps
+    configlets:
+      - AVD_P4
+  - fqdn: RR
+    parentContainerName: RRs
+    configlets:
+      - AVD_RR
   - fqdn: spine1-DC1
     parentContainerName: DC1_SPINES
     configlets:
@@ -70,7 +90,7 @@ cvp_containers:
   DC1:
     parentContainerName: AVD_FABRIC
   DC1_BORDER_LEAVES:
-    parentContainerName: DC1
+    parentContainerName: PEs
   DC1_LEAF1:
     parentContainerName: DC1_LEAVES
   DC1_LEAF2:
@@ -82,7 +102,7 @@ cvp_containers:
   DC2:
     parentContainerName: AVD_FABRIC
   DC2_BORDER_LEAVES:
-    parentContainerName: DC2
+    parentContainerName: PEs
   DC2_LEAF1:
     parentContainerName: DC2_LEAVES
   DC2_LEAF2:
@@ -91,3 +111,11 @@ cvp_containers:
     parentContainerName: DC2
   DC2_SPINES:
     parentContainerName: DC2
+  MPLS:
+    parentContainerName: AVD_FABRIC
+  PEs:
+    parentContainerName: MPLS
+  Ps:
+    parentContainerName: MPLS
+  RRs:
+    parentContainerName: MPLS

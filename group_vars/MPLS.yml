@@ -1,6 +1,8 @@
 underlay_routing_protocol: isis-sr
 overlay_routing_protocol: ibgp
 
+underlay_isis_instance_name: bb
+bgp_mesh_pes: true
 bgp_as: 1
 
 bgp_distance:
@@ -21,7 +23,7 @@ p:
   # Specific configuration of device must take place under the node definition. Each node inherites all values defined under 'defaults'
   nodes:
     # Name of the node to be defined (must be consistent with definition in inventory)
-    - name: P
+    - name: P1
       # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
       id: 93
       # Management IP to be assigned to the management interface
@@ -42,38 +44,73 @@ pe:
     # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
     loopback_ipv4_pool: 192.168.255.0/24
     virtual_router_mac_address: 00:1c:73:00:00:99
-    mpls_route_reflectors: [ RR ]
+    vtep_loopback_ipv4_pool: 10.255.1.0/24
+    #mpls_route_reflectors: [ RR ]
     # ISIS NET system id prefix
     isis_system_id_prefix: '0000.0001'
     spanning_tree_mode: none
-
+    overlay_address_families: 
+      - evpn
   # If two nodes (and only two) are in the same node_group, they will automatically form an MLAG pair
   node_groups:
     # Definition of a node group that will include two devices in MLAG.
     # Definitions under the group will be inherited by both nodes in the group
-    - group: BL1-DC1
+    - group: DC1
       nodes:
         # Definition of hostnames under the node_group
         - name: BL1-DC1
           id: 91
           mgmt_ip: 192.168.0.91/24
-    - group: BL1-DC2
+      l3_interfaces:
+          - name: Ethernet6
+            ip_address: 10.111.11.1/31
+            peer_ip: '10.111.11.0'
+            bgp:
+              peer_as: '65110'
+          - name: Ethernet7
+            ip_address: 10.112.11.1/31
+            peer_ip: '10.112.11.0'
+            bgp:
+              peer_as: '65110'
+          - name: Ethernet8
+            ip_address: 10.113.11.1/31
+            peer_ip: '10.113.11.0'
+            bgp:
+              peer_as: '65110'
+    - group: DC2
       nodes:
-        - name:
+        - name: BL1-DC2
           id: 95
           mgmt_ip: 192.168.0.95/24
+          l3_interfaces:
+          - name: Ethernet6
+            ip_address: 10.114.21.1/31
+            peer_ip: '10.114.21.0'
+            bgp:
+              peer_as: '65220'
+          - name: Ethernet7
+            ip_address: 10.115.21.1/31
+            peer_ip: '10.115.21.0'
+            bgp:
+              peer_as: '65220'
+          - name: Ethernet8
+            ip_address: 10.116.21.1/31
+            peer_ip: '10.116.21.0'
+            bgp:
+              peer_as: '65220'
+
 rr:
   defaults:
     platform: vEOS-lab
     spanning_tree_mode: none
     loopback_ipv4_pool: 192.168.255.0/24
-    mpls_route_reflectors: [ RR1 ]
+    #mpls_route_reflectors: [ RR ]
     # ISIS NET system id prefix
     isis_system_id_prefix: '0000.0002'
   node_groups:
     - group: WAN1_RR1-2
       nodes:
-        - name: RR1
+        - name: RR
           id: 90
           mgmt_ip: 192.168.0.90/24
 core_interfaces:

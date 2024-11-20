@@ -26,14 +26,18 @@
   - [IP Routing](#ip-routing)
   - [IPv6 Routing](#ipv6-routing)
   - [Static Routes](#static-routes)
+  - [Router ISIS](#router-isis)
   - [Router BGP](#router-bgp)
 - [BFD](#bfd)
   - [Router BFD](#router-bfd)
+- [MPLS](#mpls)
+  - [MPLS and LDP](#mpls-and-ldp)
+  - [MPLS Interfaces](#mpls-interfaces)
 - [Multicast](#multicast)
   - [IP IGMP Snooping](#ip-igmp-snooping)
 - [Filters](#filters)
-  - [Prefix-lists](#prefix-lists)
   - [Route-maps](#route-maps)
+  - [IP Extended Community Lists](#ip-extended-community-lists)
 - [VRF Instances](#vrf-instances)
   - [VRF Instances Summary](#vrf-instances-summary)
   - [VRF Instances Device Configuration](#vrf-instances-device-configuration)
@@ -110,18 +114,11 @@ management api http-commands
 
 STP mode: **mstp**
 
-#### MSTP Instance and Priority
-
-| Instance(s) | Priority |
-| -------- | -------- |
-| 0 | 4096 |
-
 ### Spanning Tree Device Configuration
 
 ```eos
 !
 spanning-tree mode mstp
-spanning-tree mst 0 priority 4096
 ```
 
 ## Internal VLAN Allocation Policy
@@ -176,32 +173,76 @@ vlan 17
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet6 | P2P_LINK_TO_SPINE1-DC2_Ethernet6 | routed | - | 10.114.21.1/31 | default | 9214 | False | - | - |
-| Ethernet7 | P2P_LINK_TO_SPINE2-DC2_Ethernet6 | routed | - | 10.115.21.1/31 | default | 9214 | False | - | - |
-| Ethernet8 | P2P_LINK_TO_SPINE3-DC2_Ethernet6 | routed | - | 10.116.21.1/31 | default | 9214 | False | - | - |
+| Ethernet1 | P2P_LINK_TO_P3_Ethernet1 | routed | - | 10.3.21.2/30 | default | 9214 | False | - | - |
+| Ethernet4 | P2P_LINK_TO_P4_Ethernet3 | routed | - | 10.4.21.2/30 | default | 9214 | False | - | - |
+| Ethernet5 | P2P_LINK_TO_RR_Ethernet5 | routed | - | 10.21.90.1/30 | default | 9214 | False | - | - |
+| Ethernet6 | - | routed | - | 10.114.21.1/31 | default | - | False | - | - |
+| Ethernet7 | - | routed | - | 10.115.21.1/31 | default | - | False | - | - |
+| Ethernet8 | - | routed | - | 10.116.21.1/31 | default | - | False | - | - |
+
+##### ISIS
+
+| Interface | Channel Group | ISIS Instance | ISIS BFD | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
+| --------- | ------------- | ------------- | -------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
+| Ethernet1 | - | bb | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet4 | - | bb | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet5 | - | bb | - | 100 | point-to-point | level-2 | True | - |
 
 #### Ethernet Interfaces Device Configuration
 
 ```eos
 !
-interface Ethernet6
-   description P2P_LINK_TO_SPINE1-DC2_Ethernet6
+interface Ethernet1
+   description P2P_LINK_TO_P3_Ethernet1
    no shutdown
    mtu 9214
+   no switchport
+   ip address 10.3.21.2/30
+   mpls ip
+   isis enable bb
+   isis circuit-type level-2
+   isis metric 100
+   isis hello padding
+   isis network point-to-point
+!
+interface Ethernet4
+   description P2P_LINK_TO_P4_Ethernet3
+   no shutdown
+   mtu 9214
+   no switchport
+   ip address 10.4.21.2/30
+   mpls ip
+   isis enable bb
+   isis circuit-type level-2
+   isis metric 100
+   isis hello padding
+   isis network point-to-point
+!
+interface Ethernet5
+   description P2P_LINK_TO_RR_Ethernet5
+   no shutdown
+   mtu 9214
+   no switchport
+   ip address 10.21.90.1/30
+   mpls ip
+   isis enable bb
+   isis circuit-type level-2
+   isis metric 100
+   isis hello padding
+   isis network point-to-point
+!
+interface Ethernet6
+   no shutdown
    no switchport
    ip address 10.114.21.1/31
 !
 interface Ethernet7
-   description P2P_LINK_TO_SPINE2-DC2_Ethernet6
    no shutdown
-   mtu 9214
    no switchport
    ip address 10.115.21.1/31
 !
 interface Ethernet8
-   description P2P_LINK_TO_SPINE3-DC2_Ethernet6
    no shutdown
-   mtu 9214
    no switchport
    ip address 10.116.21.1/31
 ```
@@ -214,29 +255,41 @@ interface Ethernet8
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.255.95/32 |
+| Loopback0 | MPLS_Overlay_peering | default | 192.168.255.95/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.1.95/32 |
 
 ##### IPv6
 
 | Interface | Description | VRF | IPv6 Address |
 | --------- | ----------- | --- | ------------ |
-| Loopback0 | EVPN_Overlay_Peering | default | - |
+| Loopback0 | MPLS_Overlay_peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
+
+##### ISIS
+
+| Interface | ISIS instance | ISIS metric | Interface mode |
+| --------- | ------------- | ----------- | -------------- |
+| Loopback0 | bb | - | passive |
+| Loopback1 | bb | - | passive |
 
 #### Loopback Interfaces Device Configuration
 
 ```eos
 !
 interface Loopback0
-   description EVPN_Overlay_Peering
+   description MPLS_Overlay_peering
    no shutdown
    ip address 192.168.255.95/32
+   isis enable bb
+   isis passive
+   node-segment ipv4 index 95
 !
 interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
    ip address 10.255.1.95/32
+   isis enable bb
+   isis passive
 ```
 
 ### VLAN Interfaces
@@ -278,7 +331,7 @@ interface Vlan17
 
 | Setting | Value |
 | ------- | ----- |
-| Source Interface | Loopback1 |
+| Source Interface | Loopback0 |
 | UDP port | 4789 |
 
 ##### VLAN to VNI, Flood List and Multicast Group Mappings
@@ -300,7 +353,7 @@ interface Vlan17
 !
 interface Vxlan1
    description BL1-DC2_VTEP
-   vxlan source-interface Loopback1
+   vxlan source-interface Loopback0
    vxlan udp-port 4789
    vxlan vlan 16 vni 10016
    vxlan vlan 17 vni 10017
@@ -375,6 +428,59 @@ ip routing vrf tenant-a
 ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 ```
 
+### Router ISIS
+
+#### Router ISIS Summary
+
+| Settings | Value |
+| -------- | ----- |
+| Instance | bb |
+| Net-ID | 49.0001.0000.0001.0095.00 |
+| Type | level-2 |
+| Router-ID | 192.168.255.95 |
+| Log Adjacency Changes | True |
+| SR MPLS Enabled | True |
+
+#### ISIS Interfaces Summary
+
+| Interface | ISIS Instance | ISIS Metric | Interface Mode |
+| --------- | ------------- | ----------- | -------------- |
+| Ethernet1 | bb | 100 | point-to-point |
+| Ethernet4 | bb | 100 | point-to-point |
+| Ethernet5 | bb | 100 | point-to-point |
+| Loopback0 | bb | - | passive |
+| Loopback1 | bb | - | passive |
+
+#### ISIS Segment-routing Node-SID
+
+| Loopback | IPv4 Index | IPv6 Index |
+| -------- | ---------- | ---------- |
+| Loopback0 | 95 | - |
+
+#### ISIS IPv4 Address Family Summary
+
+| Settings | Value |
+| -------- | ----- |
+| IPv4 Address-family Enabled | True |
+| Maximum-paths | 4 |
+
+#### Router ISIS Device Configuration
+
+```eos
+!
+router isis bb
+   net 49.0001.0000.0001.0095.00
+   is-type level-2
+   router-id ipv4 192.168.255.95
+   log-adjacency-changes
+   !
+   address-family ipv4 unicast
+      maximum-paths 4
+   !
+   segment-routing mpls
+      no shutdown
+```
+
 ### Router BGP
 
 ASN Notation: asplain
@@ -388,39 +494,43 @@ ASN Notation: asplain
 | BGP Tuning |
 | ---------- |
 | no bgp default ipv4-unicast |
+| distance bgp 20 200 200 |
 | maximum-paths 4 ecmp 4 |
 
 #### Router BGP Peer Groups
 
-##### EVPN-OVERLAY-PEERS
+##### MPLS-OVERLAY-PEERS
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | evpn |
+| Address Family | mpls |
+| Remote AS | 1 |
 | Source | Loopback0 |
 | BFD | True |
-| Ebgp multihop | 3 |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
-##### IPv4-UNDERLAY-PEERS
+##### VXLAN-OVERLAY-PEERS
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | ipv4 |
+| Remote AS | 65220 |
+| Source | Loopback0 |
+| Ebgp multihop | 15 |
 | Send community | all |
-| Maximum routes | 12000 |
 
 #### BGP Neighbors
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive | TTL Max Hops |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- | ------------ |
-| 10.114.21.0 | 65220 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 10.115.21.0 | 65220 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 10.116.21.0 | 65220 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 192.168.255.14 | 65220 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
-| 192.168.255.15 | 65220 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
-| 192.168.255.16 | 65220 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
+| 10.114.21.0 | 65220 | default | - | - | - | - | - | - | - | - | - |
+| 10.115.21.0 | 65220 | default | - | - | - | - | - | - | - | - | - |
+| 10.116.21.0 | 65220 | default | - | - | - | - | - | - | - | - | - |
+| 192.168.255.11 | - | default | - | - | - | - | - | - | - | - | - |
+| 192.168.255.14 | Inherited from peer group VXLAN-OVERLAY-PEERS | default | - | Inherited from peer group VXLAN-OVERLAY-PEERS | - | - | - | - | - | - | - |
+| 192.168.255.15 | Inherited from peer group VXLAN-OVERLAY-PEERS | default | - | Inherited from peer group VXLAN-OVERLAY-PEERS | - | - | - | - | - | - | - |
+| 192.168.255.16 | Inherited from peer group VXLAN-OVERLAY-PEERS | default | - | Inherited from peer group VXLAN-OVERLAY-PEERS | - | - | - | - | - | - | - |
+| 192.168.255.91 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -428,7 +538,14 @@ ASN Notation: asplain
 
 | Peer Group | Activate | Encapsulation |
 | ---------- | -------- | ------------- |
-| EVPN-OVERLAY-PEERS | True | default |
+| MPLS-OVERLAY-PEERS | True | default |
+| VXLAN-OVERLAY-PEERS | True | vxlan |
+
+##### EVPN Neighbor Default Encapsulation
+
+| Neighbor Default Encapsulation | Next-hop-self Source Interface |
+| ------------------------------ | ------------------------------ |
+| mpls | Loopback0 |
 
 #### Router BGP VLANs
 
@@ -449,36 +566,28 @@ ASN Notation: asplain
 !
 router bgp 1
    router-id 192.168.255.95
+   distance bgp 20 200 200
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
-   neighbor EVPN-OVERLAY-PEERS peer group
-   neighbor EVPN-OVERLAY-PEERS update-source Loopback0
-   neighbor EVPN-OVERLAY-PEERS bfd
-   neighbor EVPN-OVERLAY-PEERS ebgp-multihop 3
-   neighbor EVPN-OVERLAY-PEERS send-community
-   neighbor EVPN-OVERLAY-PEERS maximum-routes 0
-   neighbor IPv4-UNDERLAY-PEERS peer group
-   neighbor IPv4-UNDERLAY-PEERS send-community
-   neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
-   neighbor 10.114.21.0 peer group IPv4-UNDERLAY-PEERS
+   neighbor MPLS-OVERLAY-PEERS peer group
+   neighbor MPLS-OVERLAY-PEERS remote-as 1
+   neighbor MPLS-OVERLAY-PEERS update-source Loopback0
+   neighbor MPLS-OVERLAY-PEERS bfd
+   neighbor MPLS-OVERLAY-PEERS send-community
+   neighbor MPLS-OVERLAY-PEERS maximum-routes 0
+   neighbor VXLAN-OVERLAY-PEERS peer group
+   neighbor VXLAN-OVERLAY-PEERS remote-as 65220
+   neighbor VXLAN-OVERLAY-PEERS update-source Loopback0
+   neighbor VXLAN-OVERLAY-PEERS ebgp-multihop 15
+   neighbor VXLAN-OVERLAY-PEERS send-community
    neighbor 10.114.21.0 remote-as 65220
-   neighbor 10.114.21.0 description spine1-DC2_Ethernet6
-   neighbor 10.115.21.0 peer group IPv4-UNDERLAY-PEERS
    neighbor 10.115.21.0 remote-as 65220
-   neighbor 10.115.21.0 description spine2-DC2_Ethernet6
-   neighbor 10.116.21.0 peer group IPv4-UNDERLAY-PEERS
    neighbor 10.116.21.0 remote-as 65220
-   neighbor 10.116.21.0 description spine3-DC2_Ethernet6
-   neighbor 192.168.255.14 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.255.14 remote-as 65220
-   neighbor 192.168.255.14 description spine1-DC2
-   neighbor 192.168.255.15 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.255.15 remote-as 65220
-   neighbor 192.168.255.15 description spine2-DC2
-   neighbor 192.168.255.16 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.255.16 remote-as 65220
-   neighbor 192.168.255.16 description spine3-DC2
-   redistribute connected route-map RM-CONN-2-BGP
+   neighbor 192.168.255.14 peer group VXLAN-OVERLAY-PEERS
+   neighbor 192.168.255.15 peer group VXLAN-OVERLAY-PEERS
+   neighbor 192.168.255.16 peer group VXLAN-OVERLAY-PEERS
+   neighbor 192.168.255.91 peer group MPLS-OVERLAY-PEERS
+   neighbor 192.168.255.91 description BL1-DC1
    !
    vlan 16
       rd 192.168.255.95:10016
@@ -491,14 +600,18 @@ router bgp 1
       redistribute learned
    !
    address-family evpn
-      neighbor EVPN-OVERLAY-PEERS activate
-   !
-   address-family rt-membership
-      neighbor EVPN-OVERLAY-PEERS activate
+      neighbor default encapsulation mpls next-hop-self source-interface Loopback0
+      neighbor MPLS-OVERLAY-PEERS route-map RM-EVPN-SOO-IN in
+      neighbor MPLS-OVERLAY-PEERS route-map RM-EVPN-SOO-OUT out
+      neighbor MPLS-OVERLAY-PEERS activate
+      neighbor VXLAN-OVERLAY-PEERS activate
+      neighbor VXLAN-OVERLAY-PEERS encapsulation vxlan
    !
    address-family ipv4
-      no neighbor EVPN-OVERLAY-PEERS activate
-      neighbor IPv4-UNDERLAY-PEERS activate
+      no neighbor MPLS-OVERLAY-PEERS activate
+      neighbor 10.114.21.0 activate
+      neighbor 10.115.21.0 activate
+      neighbor 10.116.21.0 activate
    !
    vrf tenant-a
       rd 192.168.255.95:1000
@@ -526,6 +639,35 @@ router bfd
    multihop interval 300 min-rx 300 multiplier 3
 ```
 
+## MPLS
+
+### MPLS and LDP
+
+#### MPLS and LDP Summary
+
+| Setting | Value |
+| -------- | ---- |
+| MPLS IP Enabled | True |
+| LDP Enabled | False |
+| LDP Router ID | - |
+| LDP Interface Disabled Default | - |
+| LDP Transport-Address Interface | - |
+
+#### MPLS and LDP Device Configuration
+
+```eos
+!
+mpls ip
+```
+
+### MPLS Interfaces
+
+| Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
+| --------- | --------------- | ----------- | -------- |
+| Ethernet1 | True | - | - |
+| Ethernet4 | True | - | - |
+| Ethernet5 | True | - | - |
+
 ## Multicast
 
 ### IP IGMP Snooping
@@ -543,42 +685,49 @@ router bfd
 
 ## Filters
 
-### Prefix-lists
-
-#### Prefix-lists Summary
-
-##### PL-LOOPBACKS-EVPN-OVERLAY
-
-| Sequence | Action |
-| -------- | ------ |
-| 10 | permit 192.168.255.0/24 eq 32 |
-| 20 | permit 10.255.1.0/24 eq 32 |
-
-#### Prefix-lists Device Configuration
-
-```eos
-!
-ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
-   seq 10 permit 192.168.255.0/24 eq 32
-   seq 20 permit 10.255.1.0/24 eq 32
-```
-
 ### Route-maps
 
 #### Route-maps Summary
 
-##### RM-CONN-2-BGP
+##### RM-EVPN-SOO-IN
 
 | Sequence | Type | Match | Set | Sub-Route-Map | Continue |
 | -------- | ---- | ----- | --- | ------------- | -------- |
-| 10 | permit | ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY | - | - | - |
+| 10 | deny | extcommunity ECL-EVPN-SOO | - | - | - |
+| 20 | permit | - | - | - | - |
+
+##### RM-EVPN-SOO-OUT
+
+| Sequence | Type | Match | Set | Sub-Route-Map | Continue |
+| -------- | ---- | ----- | --- | ------------- | -------- |
+| 10 | permit | - | extcommunity soo 10.255.1.95:1 additive | - | - |
 
 #### Route-maps Device Configuration
 
 ```eos
 !
-route-map RM-CONN-2-BGP permit 10
-   match ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+route-map RM-EVPN-SOO-IN deny 10
+   match extcommunity ECL-EVPN-SOO
+!
+route-map RM-EVPN-SOO-IN permit 20
+!
+route-map RM-EVPN-SOO-OUT permit 10
+   set extcommunity soo 10.255.1.95:1 additive
+```
+
+### IP Extended Community Lists
+
+#### IP Extended Community Lists Summary
+
+| List Name | Type | Extended Communities |
+| --------- | ---- | -------------------- |
+| ECL-EVPN-SOO | permit | soo 10.255.1.95:1 |
+
+#### IP Extended Community Lists Device Configuration
+
+```eos
+!
+ip extcommunity-list ECL-EVPN-SOO permit soo 10.255.1.95:1
 ```
 
 ## VRF Instances

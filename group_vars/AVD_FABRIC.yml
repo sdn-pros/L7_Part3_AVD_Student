@@ -3,6 +3,10 @@ fabric_name: AVD_FABRIC
 
 service_routing_protocols_model: multi-agent
 
+custom_structured_configuration_prefix:
+  - custom_structured_configuration_
+  - custom_spines_
+
 custom_structured_configuration_spanning_tree:
   mode: mstp
 
@@ -10,7 +14,7 @@ ip_routing: true
 
 # Needed for Arista ATD Lab Environment
 dns_domain: atd.lab
-mgmt_interface: MGMT
+mgmt_interface: Management0
 mgmt_interface_vrf: MGMT
 mgmt_gateway: 192.168.0.1
 mgmt_vrf_routing: true
@@ -21,6 +25,8 @@ node_type_keys:
     type: spine
     default_evpn_role: server
     default_ptp_priority1: 20
+    network_services:
+      l3: true
 
   - key: l3leaf
     type: l3leaf
@@ -120,8 +126,9 @@ node_type_keys:
     default_overlay_routing_protocol: ibgp
     default_underlay_routing_protocol: isis-sr
     default_overlay_address_families:
-    - vpn-ipv4
+    - evpn
     default_evpn_encapsulation: mpls
+    vtep: true
 
   - key: rr
     type: rr
@@ -133,5 +140,6 @@ node_type_keys:
     default_overlay_address_families:
       - vpn-ipv4
     default_evpn_encapsulation: mpls
+
 
 ...

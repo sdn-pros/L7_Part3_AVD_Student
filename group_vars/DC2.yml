@@ -23,9 +23,6 @@ spine:
             - Ethernet3
             - Ethernet4
             - Ethernet5
-        - ipv4_pool: 10.114.21.0/30
-          downlink_interfaces: 
-            - Ethernet6
     - name: spine2-DC2
       id: 15
       mgmt_ip: 192.168.0.15/24
@@ -36,9 +33,6 @@ spine:
             - Ethernet3
             - Ethernet4
             - Ethernet5
-        - ipv4_pool: 10.115.21.0/30
-          downlink_interfaces: 
-            - Ethernet6
     - name: spine3-DC2
       id: 16
       mgmt_ip: 192.168.0.16/24
@@ -49,9 +43,6 @@ spine:
             - Ethernet3
             - Ethernet4
             - Ethernet5
-        - ipv4_pool: 10.116.21.0/30
-          downlink_interfaces: 
-            - Ethernet6
 l3leaf:
   defaults:
     platform: cEOS
@@ -66,6 +57,7 @@ l3leaf:
     virtual_router_mac_address: 00:1c:73:00:00:99
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
+    
   node_groups:
     - group: DC2_L3_LEAF12
       bgp_as: 65212
@@ -111,28 +103,28 @@ l3leaf:
             - Ethernet5
             - Ethernet5
             - Ethernet5
-gwleaf:
-  defaults:
-    platform: cEOS
-    loopback_ipv4_pool: 192.168.255.0/24
-    vtep_loopback_ipv4_pool: 10.255.1.0/24
-    uplink_interfaces: ['Ethernet3', 'Ethernet4', 'Ethernet5']
-    uplink_switches: ['spine1-DC2', 'spine2-DC2', 'spine3-DC2']
-    mlag_interfaces: ['Ethernet1', 'Ethernet2']
-    mlag_peer_ipv4_pool: 10.255.2.0/24
-    virtual_router_mac_address: 00:1c:73:00:00:99
-    spanning_tree_priority: 4096
-    spanning_tree_mode: mstp
-    bgp_as: 1
-  nodes:
-    # Name of the node to be defined (must be consistent with definition in inventory)
-    - name: BL1-DC2
-    # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
-      id: 95
-      # Management IP to be assigned to the management interface
-      mgmt_ip: 192.168.0.95/24
-      uplink_interfaces: ['Ethernet6', 'Ethernet7', 'Ethernet8']
-      uplink_switch_interfaces:
-          - Ethernet6
-          - Ethernet6
-          - Ethernet6
+#gwleaf:
+#  defaults:
+#    platform: cEOS
+#    loopback_ipv4_pool: 192.168.255.0/24
+#    vtep_loopback_ipv4_pool: 10.255.1.0/24
+#    uplink_interfaces: ['Ethernet3', 'Ethernet4', 'Ethernet5']
+#    uplink_switches: ['spine1-DC2', 'spine2-DC2', 'spine3-DC2']
+#    mlag_interfaces: ['Ethernet1', 'Ethernet2']
+#    mlag_peer_ipv4_pool: 10.255.2.0/24
+#    virtual_router_mac_address: 00:1c:73:00:00:99
+#    spanning_tree_priority: 4096
+#    spanning_tree_mode: mstp
+#    bgp_as: 1
+#  nodes:
+#    # Name of the node to be defined (must be consistent with definition in inventory)
+#    - name: BL1-DC2
+#    # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
+#      id: 95
+#      # Management IP to be assigned to the management interface
+#      mgmt_ip: 192.168.0.95/24
+#      uplink_interfaces: ['Ethernet6', 'Ethernet7', 'Ethernet8']
+#      uplink_switch_interfaces:
+#          - Ethernet6
+#          - Ethernet6
+#          - Ethernet6
