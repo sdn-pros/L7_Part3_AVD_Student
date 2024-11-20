@@ -33,6 +33,8 @@ custom_structured_configuration_router_bgp:
         activate: true
       - ip_address: '10.113.11.0'
         activate: true
+    networks:
+      - prefix: 192.168.255.91/32
   address_family_evpn:
     peer_groups:
       - name: VXLAN-OVERLAY-PEERS

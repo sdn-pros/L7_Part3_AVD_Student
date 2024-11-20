@@ -612,6 +612,7 @@ router bgp 1
       neighbor 10.114.21.0 activate
       neighbor 10.115.21.0 activate
       neighbor 10.116.21.0 activate
+      network 192.168.255.95/32
    !
    vrf tenant-a
       rd 192.168.255.95:1000

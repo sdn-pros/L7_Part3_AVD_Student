@@ -54,14 +54,14 @@ cvp_configlets:
     activate\n      neighbor VXLAN-OVERLAY-PEERS activate\n      neighbor VXLAN-OVERLAY-PEERS
     encapsulation vxlan\n   !\n   address-family ipv4\n      no neighbor MPLS-OVERLAY-PEERS
     activate\n      neighbor 10.111.11.0 activate\n      neighbor 10.112.11.0 activate\n
-    \     neighbor 10.113.11.0 activate\n   !\n   vrf tenant-a\n      rd 192.168.255.91:1000\n
-    \     route-target import evpn 1000:1000\n      route-target export evpn 1000:1000\n
-    \     router-id 192.168.255.91\n      redistribute connected\n!\nrouter isis bb\n
-    \  net 49.0001.0000.0001.0091.00\n   is-type level-2\n   router-id ipv4 192.168.255.91\n
-    \  log-adjacency-changes\n   !\n   address-family ipv4 unicast\n      maximum-paths
-    4\n   !\n   segment-routing mpls\n      no shutdown\n!\nmpls ip\n!\nmanagement
-    api http-commands\n   protocol https\n   no shutdown\n   !\n   vrf MGMT\n      no
-    shutdown\n!\nend\n"
+    \     neighbor 10.113.11.0 activate\n      network 192.168.255.91/32\n   !\n   vrf
+    tenant-a\n      rd 192.168.255.91:1000\n      route-target import evpn 1000:1000\n
+    \     route-target export evpn 1000:1000\n      router-id 192.168.255.91\n      redistribute
+    connected\n!\nrouter isis bb\n   net 49.0001.0000.0001.0091.00\n   is-type level-2\n
+    \  router-id ipv4 192.168.255.91\n   log-adjacency-changes\n   !\n   address-family
+    ipv4 unicast\n      maximum-paths 4\n   !\n   segment-routing mpls\n      no shutdown\n!\nmpls
+    ip\n!\nmanagement api http-commands\n   protocol https\n   no shutdown\n   !\n
+    \  vrf MGMT\n      no shutdown\n!\nend\n"
   AVD_BL1-DC2: "!RANCID-CONTENT-TYPE: arista\n!\nvlan internal order ascending range
     1006 1199\n!\ntransceiver qsfp default-mode 4x10G\n!\nservice routing protocols
     model multi-agent\n!\nhostname BL1-DC2\ndns domain atd.lab\n!\nspanning-tree mode
@@ -117,14 +117,14 @@ cvp_configlets:
     activate\n      neighbor VXLAN-OVERLAY-PEERS activate\n      neighbor VXLAN-OVERLAY-PEERS
     encapsulation vxlan\n   !\n   address-family ipv4\n      no neighbor MPLS-OVERLAY-PEERS
     activate\n      neighbor 10.114.21.0 activate\n      neighbor 10.115.21.0 activate\n
-    \     neighbor 10.116.21.0 activate\n   !\n   vrf tenant-a\n      rd 192.168.255.95:1000\n
-    \     route-target import evpn 1000:1000\n      route-target export evpn 1000:1000\n
-    \     router-id 192.168.255.95\n      redistribute connected\n!\nrouter isis bb\n
-    \  net 49.0001.0000.0001.0095.00\n   is-type level-2\n   router-id ipv4 192.168.255.95\n
-    \  log-adjacency-changes\n   !\n   address-family ipv4 unicast\n      maximum-paths
-    4\n   !\n   segment-routing mpls\n      no shutdown\n!\nmpls ip\n!\nmanagement
-    api http-commands\n   protocol https\n   no shutdown\n   !\n   vrf MGMT\n      no
-    shutdown\n!\nend\n"
+    \     neighbor 10.116.21.0 activate\n      network 192.168.255.95/32\n   !\n   vrf
+    tenant-a\n      rd 192.168.255.95:1000\n      route-target import evpn 1000:1000\n
+    \     route-target export evpn 1000:1000\n      router-id 192.168.255.95\n      redistribute
+    connected\n!\nrouter isis bb\n   net 49.0001.0000.0001.0095.00\n   is-type level-2\n
+    \  router-id ipv4 192.168.255.95\n   log-adjacency-changes\n   !\n   address-family
+    ipv4 unicast\n      maximum-paths 4\n   !\n   segment-routing mpls\n      no shutdown\n!\nmpls
+    ip\n!\nmanagement api http-commands\n   protocol https\n   no shutdown\n   !\n
+    \  vrf MGMT\n      no shutdown\n!\nend\n"
   AVD_P1: "!RANCID-CONTENT-TYPE: arista\n!\nvlan internal order ascending range 1006
     1199\n!\ntransceiver qsfp default-mode 4x10G\n!\nservice routing protocols model
     multi-agent\n!\nhostname P1\ndns domain atd.lab\n!\nspanning-tree mode mstp\n!\nno

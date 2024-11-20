@@ -49,6 +49,8 @@ router_bgp:
       activate: true
     - ip_address: 10.116.21.0
       activate: true
+    networks:
+    - prefix: 192.168.255.95/32
   neighbors:
   - ip_address: 192.168.255.91
     peer_group: MPLS-OVERLAY-PEERS
