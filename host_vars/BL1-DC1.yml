@@ -35,10 +35,19 @@ custom_structured_configuration_router_bgp:
         activate: true
     networks:
       - prefix: 192.168.255.91/32
+      - prefix: 0.0.0.0/0
   address_family_evpn:
+    neighbor_default:
+      next_hop_self_received_evpn_routes:
+        enable: true
+        inter_domain: true
     peer_groups:
       - name: VXLAN-OVERLAY-PEERS
         activate: true
         encapsulation: vxlan
-        
-      
+      - name: MPLS-OVERLAY-PEERS
+        domain_remote: true
+custom_structured_configuration_static_routes:
+  - vrf: default
+    destination_address_prefix: 0.0.0.0/0
+    interface: null0

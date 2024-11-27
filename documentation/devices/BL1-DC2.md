@@ -184,9 +184,9 @@ vlan 17
 
 | Interface | Channel Group | ISIS Instance | ISIS BFD | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | -------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
-| Ethernet1 | - | bb | - | 100 | point-to-point | level-2 | True | - |
-| Ethernet4 | - | bb | - | 100 | point-to-point | level-2 | True | - |
-| Ethernet5 | - | bb | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet1 | - | CORE | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet4 | - | CORE | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet5 | - | CORE | - | 100 | point-to-point | level-2 | True | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -199,7 +199,7 @@ interface Ethernet1
    no switchport
    ip address 10.3.21.2/30
    mpls ip
-   isis enable bb
+   isis enable CORE
    isis circuit-type level-2
    isis metric 100
    isis hello padding
@@ -212,7 +212,7 @@ interface Ethernet4
    no switchport
    ip address 10.4.21.2/30
    mpls ip
-   isis enable bb
+   isis enable CORE
    isis circuit-type level-2
    isis metric 100
    isis hello padding
@@ -225,7 +225,7 @@ interface Ethernet5
    no switchport
    ip address 10.21.90.1/30
    mpls ip
-   isis enable bb
+   isis enable CORE
    isis circuit-type level-2
    isis metric 100
    isis hello padding
@@ -269,8 +269,8 @@ interface Ethernet8
 
 | Interface | ISIS instance | ISIS metric | Interface mode |
 | --------- | ------------- | ----------- | -------------- |
-| Loopback0 | bb | - | passive |
-| Loopback1 | bb | - | passive |
+| Loopback0 | CORE | - | passive |
+| Loopback1 | CORE | - | passive |
 
 #### Loopback Interfaces Device Configuration
 
@@ -280,7 +280,7 @@ interface Loopback0
    description MPLS_Overlay_peering
    no shutdown
    ip address 192.168.255.95/32
-   isis enable bb
+   isis enable CORE
    isis passive
    node-segment ipv4 index 95
 !
@@ -288,7 +288,7 @@ interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
    ip address 10.255.1.95/32
-   isis enable bb
+   isis enable CORE
    isis passive
 ```
 
@@ -420,12 +420,14 @@ ip routing vrf tenant-a
 | VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
 | --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 192.168.0.1 | - | 1 | - | - | - |
+| default | 0.0.0.0/0 | - | null0 | 1 | - | - | - |
 
 #### Static Routes Device Configuration
 
 ```eos
 !
 ip route vrf MGMT 0.0.0.0/0 192.168.0.1
+ip route 0.0.0.0/0 Null0
 ```
 
 ### Router ISIS
@@ -434,22 +436,28 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | Settings | Value |
 | -------- | ----- |
-| Instance | bb |
+| Instance | CORE |
 | Net-ID | 49.0001.0000.0001.0095.00 |
 | Type | level-2 |
 | Router-ID | 192.168.255.95 |
 | Log Adjacency Changes | True |
 | SR MPLS Enabled | True |
 
+#### ISIS Route Redistribution
+
+| Route Type | Route-Map | Include Leaked |
+| ---------- | --------- | -------------- |
+| bgp | - | - |
+
 #### ISIS Interfaces Summary
 
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
-| Ethernet1 | bb | 100 | point-to-point |
-| Ethernet4 | bb | 100 | point-to-point |
-| Ethernet5 | bb | 100 | point-to-point |
-| Loopback0 | bb | - | passive |
-| Loopback1 | bb | - | passive |
+| Ethernet1 | CORE | 100 | point-to-point |
+| Ethernet4 | CORE | 100 | point-to-point |
+| Ethernet5 | CORE | 100 | point-to-point |
+| Loopback0 | CORE | - | passive |
+| Loopback1 | CORE | - | passive |
 
 #### ISIS Segment-routing Node-SID
 
@@ -468,9 +476,10 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 ```eos
 !
-router isis bb
+router isis CORE
    net 49.0001.0000.0001.0095.00
    is-type level-2
+   redistribute bgp
    router-id ipv4 192.168.255.95
    log-adjacency-changes
    !
@@ -547,6 +556,14 @@ ASN Notation: asplain
 | ------------------------------ | ------------------------------ |
 | mpls | Loopback0 |
 
+##### EVPN DCI Gateway Summary
+
+| Settings | Value |
+| -------- | ----- |
+| Remote Domain Peer Groups | MPLS-OVERLAY-PEERS |
+| L3 Gateway Configured | True |
+| L3 Gateway Inter-domain | True |
+
 #### Router BGP VLANs
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
@@ -593,25 +610,35 @@ router bgp 1
       rd 192.168.255.95:10016
       route-target both 10016:10016
       redistribute learned
+      !
+      rd evpn domain remote 1:10016
+      route-target import export evpn domain remote 1:10016
+
    !
    vlan 17
       rd 192.168.255.95:10017
       route-target both 10017:10017
       redistribute learned
+      !
+      rd evpn domain remote 1:10017
+      route-target import export evpn domain remote 1:10017
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
       neighbor MPLS-OVERLAY-PEERS route-map RM-EVPN-SOO-IN in
       neighbor MPLS-OVERLAY-PEERS route-map RM-EVPN-SOO-OUT out
       neighbor MPLS-OVERLAY-PEERS activate
+      neighbor MPLS-OVERLAY-PEERS domain remote
       neighbor VXLAN-OVERLAY-PEERS activate
       neighbor VXLAN-OVERLAY-PEERS encapsulation vxlan
+      neighbor default next-hop-self received-evpn-routes route-type ip-prefix inter-domain
    !
    address-family ipv4
       no neighbor MPLS-OVERLAY-PEERS activate
       neighbor 10.114.21.0 activate
       neighbor 10.115.21.0 activate
       neighbor 10.116.21.0 activate
+      network 0.0.0.0/0
       network 192.168.255.95/32
    !
    vrf tenant-a

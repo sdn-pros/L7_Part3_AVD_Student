@@ -6,6 +6,7 @@ service_routing_protocols_model: multi-agent
 custom_structured_configuration_prefix:
   - custom_structured_configuration_
   - custom_spines_
+  - custom_mpls_
 
 custom_structured_configuration_spanning_tree:
   mode: mstp

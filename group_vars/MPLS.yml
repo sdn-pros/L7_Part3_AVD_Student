@@ -1,7 +1,7 @@
 underlay_routing_protocol: isis-sr
 overlay_routing_protocol: ibgp
 
-underlay_isis_instance_name: bb
+underlay_isis_instance_name: CORE
 bgp_mesh_pes: true
 bgp_as: 1
 
@@ -169,4 +169,7 @@ core_interfaces:
       profile: local_profile
       interfaces: [ Ethernet5, Ethernet5]
       subnet: 10.21.90.0/30 
-        
+
+custom_mpls_router_isis:
+  redistribute_routes:
+    - source_protocol: bgp

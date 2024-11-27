@@ -33,12 +33,12 @@ loopback_interfaces:
   description: LSR_Router_ID
   shutdown: false
   ip_address: 192.168.255.94/32
-  isis_enable: bb
+  isis_enable: CORE
   isis_passive: true
   node_segment:
     ipv4_index: 94
 router_isis:
-  instance: bb
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0000.0094.00
   router_id: 192.168.255.94
@@ -51,6 +51,8 @@ router_isis:
   segment_routing_mpls:
     router_id: 192.168.255.94
     enabled: true
+  redistribute_routes:
+  - source_protocol: bgp
 mpls:
   ip: true
 ethernet_interfaces:
@@ -63,7 +65,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9214
   ip_address: 10.1.2.2/30
-  isis_enable: bb
+  isis_enable: CORE
   isis_metric: 100
   isis_network_point_to_point: true
   isis_hello_padding: true
@@ -79,7 +81,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9214
   ip_address: 10.2.11.1/30
-  isis_enable: bb
+  isis_enable: CORE
   isis_metric: 100
   isis_network_point_to_point: true
   isis_hello_padding: true
@@ -95,7 +97,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9214
   ip_address: 10.2.4.1/30
-  isis_enable: bb
+  isis_enable: CORE
   isis_metric: 100
   isis_network_point_to_point: true
   isis_hello_padding: true

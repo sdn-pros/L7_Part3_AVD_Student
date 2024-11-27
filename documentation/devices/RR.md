@@ -149,8 +149,8 @@ vlan internal order ascending range 1006 1199
 
 | Interface | Channel Group | ISIS Instance | ISIS BFD | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | -------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
-| Ethernet1 | - | bb | - | 100 | point-to-point | level-2 | True | - |
-| Ethernet5 | - | bb | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet1 | - | CORE | - | 100 | point-to-point | level-2 | True | - |
+| Ethernet5 | - | CORE | - | 100 | point-to-point | level-2 | True | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -163,7 +163,7 @@ interface Ethernet1
    no switchport
    ip address 10.11.90.2/30
    mpls ip
-   isis enable bb
+   isis enable CORE
    isis circuit-type level-2
    isis metric 100
    isis hello padding
@@ -176,7 +176,7 @@ interface Ethernet5
    no switchport
    ip address 10.21.90.2/30
    mpls ip
-   isis enable bb
+   isis enable CORE
    isis circuit-type level-2
    isis metric 100
    isis hello padding
@@ -203,7 +203,7 @@ interface Ethernet5
 
 | Interface | ISIS instance | ISIS metric | Interface mode |
 | --------- | ------------- | ----------- | -------------- |
-| Loopback0 | bb | - | passive |
+| Loopback0 | CORE | - | passive |
 
 #### Loopback Interfaces Device Configuration
 
@@ -213,7 +213,7 @@ interface Loopback0
    description MPLS_Overlay_peering
    no shutdown
    ip address 192.168.255.90/32
-   isis enable bb
+   isis enable CORE
    isis passive
    node-segment ipv4 index 90
 ```
@@ -276,20 +276,26 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 | Settings | Value |
 | -------- | ----- |
-| Instance | bb |
+| Instance | CORE |
 | Net-ID | 49.0001.0000.0002.0090.00 |
 | Type | level-2 |
 | Router-ID | 192.168.255.90 |
 | Log Adjacency Changes | True |
 | SR MPLS Enabled | True |
 
+#### ISIS Route Redistribution
+
+| Route Type | Route-Map | Include Leaked |
+| ---------- | --------- | -------------- |
+| bgp | - | - |
+
 #### ISIS Interfaces Summary
 
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
-| Ethernet1 | bb | 100 | point-to-point |
-| Ethernet5 | bb | 100 | point-to-point |
-| Loopback0 | bb | - | passive |
+| Ethernet1 | CORE | 100 | point-to-point |
+| Ethernet5 | CORE | 100 | point-to-point |
+| Loopback0 | CORE | - | passive |
 
 #### ISIS Segment-routing Node-SID
 
@@ -308,9 +314,10 @@ ip route vrf MGMT 0.0.0.0/0 192.168.0.1
 
 ```eos
 !
-router isis bb
+router isis CORE
    net 49.0001.0000.0002.0090.00
    is-type level-2
+   redistribute bgp
    router-id ipv4 192.168.255.90
    log-adjacency-changes
    !

@@ -88,12 +88,12 @@ loopback_interfaces:
   description: MPLS_Overlay_peering
   shutdown: false
   ip_address: 192.168.255.90/32
-  isis_enable: bb
+  isis_enable: CORE
   isis_passive: true
   node_segment:
     ipv4_index: 90
 router_isis:
-  instance: bb
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0002.0090.00
   router_id: 192.168.255.90
@@ -106,6 +106,8 @@ router_isis:
   segment_routing_mpls:
     router_id: 192.168.255.90
     enabled: true
+  redistribute_routes:
+  - source_protocol: bgp
 mpls:
   ip: true
 router_bfd:
@@ -123,7 +125,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9214
   ip_address: 10.11.90.2/30
-  isis_enable: bb
+  isis_enable: CORE
   isis_metric: 100
   isis_network_point_to_point: true
   isis_hello_padding: true
@@ -139,7 +141,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9214
   ip_address: 10.21.90.2/30
-  isis_enable: bb
+  isis_enable: CORE
   isis_metric: 100
   isis_network_point_to_point: true
   isis_hello_padding: true
