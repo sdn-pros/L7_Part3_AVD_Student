@@ -6,7 +6,7 @@ all:
           ansible_httpapi_host: 192.168.0.5
           ansible_host: 192.168.0.5
           ansible_user: arista
-          ansible_password: aristalw6v
+          ansible_password: <paste-password>
           ansible_connection: httpapi
           ansible_httpapi_use_ssl: True
           ansible_httpapi_validate_certs: False
@@ -15,7 +15,7 @@ all:
     AVD_FABRIC:
       vars:
         ansible_user: arista
-        ansible_ssh_pass: aristalw6v
+        ansible_ssh_pass: <paste-password>
         ansible_connection: network_cli
         ansible_network_os: eos
       children:

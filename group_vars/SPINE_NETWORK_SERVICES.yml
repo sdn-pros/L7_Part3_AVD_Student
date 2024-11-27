@@ -1,15 +1,1 @@
-tenants:
-  - name: SpineTest
-    vrfs:
-      - name: default
-        l3_interfaces:
-          - interfaces: [ Ethernet6 ]
-            nodes: [ spine1_DC1]
-            enabled: true
-            ip_addresses: [ 10.111.11.0/31]
-        bgp_peers:
-          - ip_address: "10.111.11.1"
-            description: "evpn_Peering_to_border"
-            remote_as: "1"
-            nodes:
-            - spine1_DC1
+

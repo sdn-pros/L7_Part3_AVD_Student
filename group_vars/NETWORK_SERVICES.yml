@@ -13,9 +13,3 @@ tenants:
             enabled: true
             # IP anycast gateway to be used in the SVI in every leaf.
             ip_address_virtual: 172.16.16.254/24
-          "17":
-            # SVI Description
-            name: VLAN17
-            enabled: true
-            # IP anycast gateway to be used in the SVI in every leaf.
-            ip_address_virtual: 172.16.17.254/24
