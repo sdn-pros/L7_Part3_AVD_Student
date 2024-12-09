@@ -6,8 +6,3 @@ evpn_overlay_bgp_rtc: true
 spine:
   defaults:
     platform: cEOS
-    loopback_ipv4_pool: 192.168.255.0/24
-    # ASN to be used by BGP
-    bgp_as: 65110
-  nodes:
-    
