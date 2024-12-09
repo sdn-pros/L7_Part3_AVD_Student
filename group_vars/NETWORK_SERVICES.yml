@@ -1,15 +1,2 @@
 ---
 tenants:
-  # Tenant A VRFs 
-  - name: Tenant_A
-    mac_vrf_vni_base: 10000
-    vrfs:
-      - name: tenant-a
-        vrf_vni: 1000
-        svis:
-          "16":
-            # SVI Description
-            name: VLAN16
-            enabled: true
-            # IP anycast gateway to be used in the SVI in every leaf.
-            ip_address_virtual: 172.16.16.254/24
