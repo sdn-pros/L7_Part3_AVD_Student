@@ -1,7 +1,1 @@
-custom_structured_configuration_vxlan_interface:
-  Vxlan1:
-    vxlan:
-      source_interface: Loopback0
-      vrfs:
-        - name: tenant-a
-          vni: 1000
+
