@@ -1,4 +1,1 @@
-custom_structured_configuration_ethernet_interfaces:
-  - name: 'Ethernet6'
-    type: routed
-    ip_address: 10.112.11.0/31
+
